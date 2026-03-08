@@ -26,6 +26,7 @@ OAuth2-Proxy can be configured to handle web traffic directly or handle `proxy_p
 An example OAuth2-Proxy docker-compose is below:
 
 ```yaml
+services:
   oauth2-proxy:
     container_name: oauth2-proxy
     image: quay.io/oauth2-proxy/oauth2-proxy:v<Check_Releases_For_Latest>
