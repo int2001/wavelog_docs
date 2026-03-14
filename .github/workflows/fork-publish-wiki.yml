@@ -22,6 +22,9 @@ jobs:
       - name: Sync docs to wiki
         run: rsync -av --delete --exclude='.git' docs/ wiki/
 
+      - name: Create wiki home page from index.md
+        run: cp wiki/index.md wiki/Home.md
+
       - name: Commit and push
         run: |
           cd wiki
