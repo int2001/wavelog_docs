@@ -152,7 +152,6 @@ All standard ADIF fields populated during logging are included. The two non-ADIF
 
 > **Frequency format:** Frequencies in CAT events are in **Hz** (integer string). Frequencies in QSO events (`COL_FREQ`) follow the ADIF convention and are in **MHz** (decimal string, e.g. `"14.074"`).
 
-
 ---
 
 ## Subscribing — quick examples
