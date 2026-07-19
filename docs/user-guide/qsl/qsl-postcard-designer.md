@@ -8,8 +8,6 @@ and then generate a multi-page PDF — one postcard per callsign.
 Cards are **standard 5.5 × 3.5 inch** (≈ 13.97 × 8.89 cm) landscape QSL cards, the
 size most bureaus and printers expect.
 
----
-
 ## 1. Before you start (prerequisites)
 
 - You must be **logged in**.
@@ -20,18 +18,15 @@ size most bureaus and printers expect.
   HamQTH). A postcard is only produced for a callsign that has a usable mailing
   address on file. If a callsign has no address, its card is silently skipped.
 
-> **Units:** the designer follows your measurement preference. If you use
-> **kilometres**, dimensions are shown in **centimetres**; otherwise **inches**.
-> Either way the printed PDF is always correct.
-
----
+!!! note "Units"
+    The designer follows your measurement preference. If you use **kilometres**,
+    dimensions are shown in **centimetres**; otherwise **inches**. Either way the
+    printed PDF is always correct.
 
 ## 2. Opening the designer
 
 Open the user menu -> **QSL Postcard Designer**
 (the card icon). You land on a three-pane editor with a toolbar across the top.
-
----
 
 ## 3. Quick start (5 steps)
 
@@ -46,8 +41,6 @@ Open the user menu -> **QSL Postcard Designer**
 
 You now have a template you can print from, described in [§11](#11-printing-postcards-for-real).
 
----
-
 ## 4. Toolbar
 
 | Control | Purpose |
@@ -61,8 +54,6 @@ You now have a template you can print from, described in [§11](#11-printing-pos
 | **Undo / Redo** | Step backwards/forwards through your changes. |
 | **Zoom** − / reset / + | Zoom the canvas. Also **Ctrl + mouse wheel**. |
 | **Print offset X / Y** | Global calibration offset applied to **every** element at print time. See [§9](#9-calibration--print-offset). |
-
----
 
 ## 5. Placing and arranging fields
 
@@ -110,8 +101,6 @@ Right-click an element for **Duplicate**, **Delete**, and (with 2+ selected)
 **Align & distribute**: align left/centre/right, top/middle/bottom, distribute
 evenly, or centre the group on the page.
 
----
-
 ## 6. The Properties panel
 
 When an element is selected, edit it here:
@@ -129,8 +118,6 @@ When an element is selected, edit it here:
 | **Disable Auto-Snap** | Lets this element move freely, ignoring the grid and other elements. |
 | **Duplicate / Delete** | Quick actions for the selected element(s). |
 
----
-
 ## 7. Background images
 
 1. In the toolbar, **choose a file** (`.jpg`, `.jpeg`, or `.png`, up to 5 MB).
@@ -141,8 +128,6 @@ When an element is selected, edit it here:
   Uncheck it if you'll be printing onto **pre-printed card stock**.
 - Background images are tied to your templates: when you delete the last template
   that uses an image, the file is removed from disk automatically.
-
----
 
 ## 8. Multi-QSO cards (several contacts per card)
 
@@ -160,9 +145,10 @@ When this is greater than 1:
 - **Address fields always print once per card** — a card is always addressed to a
   single station.
 
-> Cards are **always grouped by callsign**. One postcard never mixes contacts with
-> different callsigns. If a callsign has more QSOs than fit on one card, the extras
-> spill onto a second card for the same station.
+!!! note
+    Cards are **always grouped by callsign**. One postcard never mixes contacts with
+    different callsigns. If a callsign has more QSOs than fit on one card, the extras
+    spill onto a second card for the same station.
 
 ### Other template options
 
@@ -171,8 +157,6 @@ When this is greater than 1:
 - **Skip address printing** — **checked by default.** Uncheck it when you want the
   recipient's mailing address printed on the card (i.e. you're mailing the cards
   yourself, not using pre-addressed stock).
-
----
 
 ## 9. Calibration & print offset
 
@@ -188,8 +172,6 @@ fixed amount at print time.
    down).
 4. Re-print to confirm. Save the template so the calibration is remembered.
 
----
-
 ## 10. Saving, loading & deleting templates
 
 - **Save:** type a name in **Template name** and click **Save**. Saving again with
@@ -201,15 +183,15 @@ fixed amount at print time.
 
 Templates are private to your user account.
 
----
-
 ## 11. Printing postcards for real
 
 Once you have a saved template, there are two ways to print real postcards from
 your logbook:
 
-1. User menu -> QSL Queue page.
-2. Advanced logbook. Check which contacts to generate a PDF, then selected "Print QSL card" from the Actions menu.
+1. The [QSL Queue](qsl-queue.md) (`User menu -> QSL Queue`).
+2. The [Advanced logbook](../logbook/advanced-logbook.md) — select the contacts, then choose "Print QSL card" from the Actions menu.
+
+If you would rather print labels for pre-printed cards, see [Labels](labels.md).
 
 ### A. All QSOs awaiting a card
 
@@ -222,9 +204,10 @@ qslcard per callsign.
 In the QSL print list, tick the QSOs you want, then click **"Print Selected QSO
 Postcards"**. Choose a template and generate the PDF for just those contacts.
 
-> **All print options come from the template**, not from the print screens. The
-> number of QSOs per card, background, and address settings are whatever you saved
-> in the designer.
+!!! note
+    **All print options come from the template**, not from the print screens. The
+    number of QSOs per card, background, and address settings are whatever you saved
+    in the designer.
 
 ### C. Quick proof / demo PDF
 
@@ -232,11 +215,10 @@ From the designer toolbar, the **PDF** button produces a demo PDF using a handfu
 of your most recent QSOs — handy for checking layout and calibration before a real
 print run.
 
-> **Generating a PDF does not mark QSOs as "sent".** After you've actually mailed
-> the cards, mark them sent separately from the QSL print page
-> (**"Mark requested QSLs as sent"**).
-
----
+!!! warning
+    **Generating a PDF does not mark QSOs as "sent".** After you've actually mailed
+    the cards, mark them sent separately from the [QSL Queue](qsl-queue.md)
+    (**"Mark ALL requested QSLs as sent"**).
 
 ## 12. Keyboard & mouse reference
 
@@ -252,8 +234,6 @@ print run.
 | Zoom canvas | **Ctrl + mouse wheel** |
 | Clear selection / close menu | **Esc** |
 | Right-click element | Context menu (align, distribute, duplicate, delete) |
-
----
 
 ## 13. Tips & troubleshooting
 

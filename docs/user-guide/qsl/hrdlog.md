@@ -1,21 +1,27 @@
-# HRDLOG.net Integration
+# HRDLog.net
 
-Wavelog allows HRDOG.net QSO push, this allows you to send any QSOs logged to the third party service. Setup of this feature is simple.
+Wavelog pushes your QSOs to HRDLog.net. This is a **one-way** integration — HRDLog.net does not return confirmations.
 
-When creating or editing the Station Profile there is a field for the HRDLOG.net code. Once this is provided when you Add/Edit a QSO this information will be forwarded to HRDLOG.net's API
+The page lives at `User menu -> Third-Party Services -> HRDLog Logbook`.
 
-Tips
+## Setup
 
-* If you don't know your HRDLOG.net code, it can be found at [https://www.hrdlog.net/EditUser.aspx](https://www.hrdlog.net/EditUser.aspx)
+HRDLog.net is configured **per station location** (`Station Setup -> edit location`):
 
-## Batch Uploading
+| Field | Description |
+|---|---|
+| **HRDLog.net Username** | The username you are registered with at HRDLog.net, usually your callsign |
+| **HRDLog.net API Key** | The code from your HRDLog.net user profile |
+| **HRDLog.net Logbook Realtime Upload** | *Yes* (push each QSO right after logging), *No* (batch only) or *Disabled* |
 
-You can run batch uploading to HRDLOG.net, this is useful in case of instances where HRDLOG.net is down, or you have edited a QSO these are uploaded with this process.
+Create the API key on your <a href="https://www.hrdlog.net/EditUser.aspx" target="_blank" rel="noopener noreferrer">HRDLog.net user profile page</a>.
 
-```bash
-*/2 * * * * curl --silent https://<url-and-path-to-wavelog>/index.php/hrdlog/upload/  &>/dev/null
-```
+## Batch uploading
 
-## Mark QSOs as uploaded
+The batch upload catches QSOs that were edited after logging, or that failed while HRDLog.net was unreachable. Enable the `hrdlog_upload` job in the Cronmanager (`Admin -> Cron Jobs`); it defaults to every 6 hours.
 
-Under HRDLog Logbook and Mark QSOs, you can mark your QSOs uploaded if they are already uploaded to the HRDLOG.net Logbook.
+You can also trigger an upload manually per station location on the HRDLog page.
+
+## Marking QSOs as already uploaded
+
+If you uploaded to HRDLog.net by other means before, use **Mark QSOs** on the HRDLog page to flag a date range as uploaded without sending it again. The same can be done during [ADIF import/export](../logbook/adif-import-export.md).
