@@ -27,18 +27,22 @@ On-Air widget displays on which frequency you are currently active, utilizing yo
 
 Some aspects of the widget can be further configured via GET parameters appended to the URL. If some option is not supplied, the default value is used.
 
+```text
 https://[wavelog url]/index.php/widgets/on_air/xxxxxxxxxx?[option0]=[value]&[option1]=[value]&[option2]=[value]
+```
 
 | option | expected value | purpose | default value |
 |----|----|----|---|
-|text_size|1 - 6|font size used for the text displayed in widget|1|
-|theme|default / cyborg / darkly / cosmo / superhero|appearance theme|theme, that user has selected in his account settings|
-|radio_timeout_seconds|60 - 10000|how many seconds must pass since the last radio update for radio to be considered off-air|value, that is set in global Wavelog settings|
-|nojs|1|Forces qrz.com to update the widget from time to time without reloading the whole page|disabled|
+|`text_size`|`1` - `6`|font size used for the text displayed in widget|1|
+|`theme`|`default` / `cyborg` / `darkly` / `cosmo` / `superhero`|appearance theme|theme, that user has selected in his account settings|
+|`radio_timeout_seconds`|`60` - `10000`|how many seconds must pass since the last radio update for radio to be considered off-air|value, that is set in global Wavelog settings|
+|`nojs`|`1`|Forces qrz.com to update the widget from time to time without reloading the whole page|disabled|
 
 ### Example URL
 
+```text
 https://[wavelog url]/index.php/widgets/on_air/xxxxxxxxxx?text_size=3&theme=darkly&radio_timeout_seconds=90&nojs=1
+```
 
 ## Usage
 
