@@ -230,10 +230,6 @@ The field `tx_pwr` and fields starting with `my_` are retained and _not reset_ b
 
 ADIF-exports may include fields not visible in Wavelog, like `sfi` or `rx_pwr` from the example.
 
-## Development Progress
-
-Currently in work is a "Callbook Lookup" feature to lookup callsigns automatically [from the set callbook](../../user-guide/integrations/callsign-lookup.md).
-
 ***
 
 Links:
