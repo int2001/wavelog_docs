@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Restore Lychee Cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: .lycheecache
           key: lychee-cache-${{ github.ref_name }}
