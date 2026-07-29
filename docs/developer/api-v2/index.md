@@ -1,5 +1,9 @@
 # API v2
 
+!!! warning "Wavelog Version 3.1.0 or later required"
+    API v2 is only available in Wavelog 3.1.0 and later. If your instance runs an
+    earlier version, please upgrade first.
+
 Wavelog's **REST API v2** is a modern, resource-oriented HTTP API for third-party
 tools — radios, external loggers, monitoring systems and your own scripts. It runs
 side by side with the [legacy v1 API](../api.md): v2 does not replace v1, and both
