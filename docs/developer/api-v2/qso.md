@@ -85,6 +85,7 @@ Filters (all optional):
 | Parameter | Default | Notes |
 | --- | --- | --- |
 | `station_id` | all owned | Comma-separated station-location ids; ids you do not own return `403 forbidden` |
+| `callsign` | — | Exact match on the worked callsign, e.g. `4W7EST` (case-insensitive); invalid input returns `400 validation_error` |
 | `band` | — | Band filter, e.g. `20m` or `SAT` |
 | `mode` | — | Mode/submode filter, e.g. `SSB` or `FT8` (matches the main mode or the submode) |
 | `qsl_filter` | — | Comma list of `lotw`, `qsl`, `eqsl`, `qrz`, `clublog` (OR-combined) |
@@ -140,8 +141,8 @@ pagination state — `total`, `total_pages` and `has_more` — so you can page u
 `GET /api/v2/qso?format=adif`
 
 Renders the **same filtered result set** as the list above, but as ADIF instead of
-JSON — so all the [list filters](#list-qsos) (`station_id`, `band`, `mode`,
-`qsl_filter`, `since_id`) apply. This is the v2 equivalent of the v1
+JSON — so all the [list filters](#list-qsos) (`station_id`, `callsign`, `band`,
+`mode`, `qsl_filter`, `since_id`) apply. This is the v2 equivalent of the v1
 `get_contacts_adif` endpoint.
 
 The batch size is `per_page` — for ADIF it defaults to `1000` (up to the shared
