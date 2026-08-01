@@ -53,13 +53,16 @@ Anything else is refused with `403 forbidden`:
 {
   "error": {
     "code": "forbidden",
-    "message": "Token is not a club officer"
+    "message": "Token is neither a club officer nor an admin"
   }
 }
 ```
 
 That covers a personal token of a regular user, a club token below officer level
-and a token whose membership has since been revoked alike. See
+and a token whose membership has since been revoked alike. The message names
+whichever role was missing — a club token below officer level is turned away
+with `Token is not a club officer`, because an administrator's rights are not
+what it lacked. Match on the `code`, not the message. See
 [Clubstations](clubstation.md) for the permission levels.
 
 !!! note "The scopes are only offered where they are usable"

@@ -75,9 +75,10 @@ To set up a Clubstation, you need to be a Wavelog Admin with access to the `conf
     Added users can now access the Clubstation with their assigned permission level.
 
     !!! tip "Managing permissions through the API"
-        Club Officers can do the same over the REST API instead of this page —
-        see the [Club resource](../../developer/api-v2/club.md). It needs a
-        token created from inside a Clubstation session by an Officer.
+        The same can be done over the REST API instead of this page — see the
+        [Club resource](../../developer/api-v2/club.md). A Club Officer needs a
+        token created from inside a Clubstation session; as an Administrator you
+        can use your own personal token and name the club with `?club_id=`.
 
 ---
 

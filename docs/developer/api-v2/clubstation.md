@@ -148,8 +148,9 @@ permissions:
 | `DELETE /api/v2/club/{user_id}` | `403` | ✅ |
 
 The refusal is a plain `forbidden` rather than the
-`insufficient_club_permission` used elsewhere, because a personal token is
-turned away by the same check:
+`insufficient_club_permission` used elsewhere: the resource turns away everything
+that is neither an officer nor a Wavelog administrator, and a personal token
+gets the same code with a message naming the other missing role.
 
 ```json
 {
