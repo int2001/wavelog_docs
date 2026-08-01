@@ -47,6 +47,13 @@ Levels 3 and 6 are treated identically by the API. The difference between them
 in the web UI is about which ADIF screens a member may open; over the API both
 are simply "not an officer".
 
+!!! note "Wavelog administrators"
+    A club token created by a Wavelog administrator works even when they hold no
+    permission level on that club — they are treated as an officer, the same way
+    the web UI lets them manage every clubstation. An administrator who *does*
+    have an explicit level is treated by that level instead, so setting yourself
+    to Club Member stays meaningful.
+
 ## What a member below officer level may do
 
 ### Their own QSOs only
@@ -126,9 +133,42 @@ locator recorded in a QSO the member is not allowed to list:
   `detail=full`) when the only matching QSO belongs to another operator.
 - `?grid=` and `?grid=all` only consider the member's own QSOs.
 
-### Club member list
+### Club membership is officer-only
 
-`GET /api/v2/club` stays officer-only. No disclosure of member information is provided to non-officers. See [Club](club.md).
+The whole [Club](club.md) resource stays officer-only — both reading the member
+list (no disclosure of member information to non-officers) and managing
+permissions:
+
+| Request | Level 3 / 6 | Level 9 |
+| --- | --- | --- |
+| `GET /api/v2/club` | `403` | ✅ |
+| `GET /api/v2/club/{user_id}` | `403` | ✅ |
+| `POST /api/v2/club` | `403` | ✅ |
+| `PATCH /api/v2/club/{user_id}` | `403` | ✅ |
+| `DELETE /api/v2/club/{user_id}` | `403` | ✅ |
+
+The refusal is a plain `forbidden` rather than the
+`insufficient_club_permission` used elsewhere, because a personal token is
+turned away by the same check:
+
+```json
+{
+  "error": {
+    "code": "forbidden",
+    "message": "Token is not a club officer"
+  }
+}
+```
+
+An officer cannot change or remove their **own** membership through the API, so
+they cannot lock the club out of its permission management. See
+[Club](club.md#guard-rails).
+
+A Wavelog administrator reaches the same resource from the outside, with a
+personal token and `?club_id=`, and is not bound by that rule — see
+[Wavelog administrators](club.md#wavelog-administrators). The `club:*` scopes
+are only offered to sessions that match one of the two roles, so a regular user
+is not shown them at all.
 
 ## Statistics are club-wide
 
@@ -148,26 +188,40 @@ Do not use the statistic totals to paginate or reconcile a QSO list.
 
 ## Losing membership
 
-The permission is checked on every request, so removing a member from the club
-takes effect at once — including for tokens that were set to never expire. Any
-call made with such a token afterwards is refused:
+Removing a member from the club **deletes every club token they created for it**
+— including tokens that were set to never expire. This is the same cleanup the
+v1 API keys have always had, and it takes effect at once. Any call made with
+such a token afterwards is refused:
 
 ```json
 {
   "error": {
-    "code": "club_access_revoked",
-    "message": "The clubstation membership behind this token has been revoked"
+    "code": "invalid_token",
+    "message": "Invalid or revoked API token"
   }
 }
 ```
 
-The status is `403`, not `401`: the token itself is still valid, only the
-permission behind it is gone. Re-adding the member restores access immediately.
+The status is `401`: the token no longer exists. Re-adding the member restores
+their permission, but not the token — they have to create a new one.
+
+Two things are *not* affected:
+
+- The member's **personal** tokens (`owner == creator`). Those belong to their
+  own account, not to the club.
+- Tokens other members created for the same club. The cleanup is per member.
 
 !!! tip "Handling this in a client"
-    Treat `club_access_revoked` as permanent and stop retrying — unlike
-    `rate_limited` it will not resolve on its own. Surface it to the user: the
-    fix is on the club's side, not the client's.
+    Treat `401 invalid_token` as permanent and stop retrying — unlike
+    `rate_limited` it will not resolve on its own. Surface it to the user: they
+    need a new token, and only the club can grant the membership behind it.
+
+!!! note "`club_access_revoked` still exists"
+    A second, independent check re-reads the membership on every request. It
+    guards the cases the cleanup above cannot reach — a membership removed
+    directly in the database, for instance — and answers `403
+    club_access_revoked` with the token left intact. A client should handle both
+    codes; in day-to-day use it will see the `401`.
 
 ## Summary
 
@@ -182,4 +236,5 @@ permission behind it is gone. Re-adding the member restores access immediately.
 | Other operators' radios | — | `404` | ✅ |
 | Lookups across all operators | ✅ | own only | ✅ |
 | Club member list | — | `403` | ✅ |
+| Manage club permissions | — | `403` | ✅ (not your own) |
 | Statistics | own | club-wide | club-wide |
