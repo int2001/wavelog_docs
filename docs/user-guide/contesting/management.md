@@ -74,6 +74,21 @@ Available targets: DOK, Gridsquare, QTH, Name, Age, State, RX Power (W).
 
 When enabled, the logger performs a callbook lookup as you type a callsign and pre-fills name, QTH, and grid square. When disabled, only the DXCC entity is calculated locally — useful if you want faster input and do not need additional station details.
 
+### Serial Numbers
+
+These two options only matter when the **Serial Number** exchange field is active.
+
+| Option | Description |
+|--------|-------------|
+| **Count serial number per band** | When enabled, the sent serial number starts at 1 on each band instead of running continuously across the whole contest. Some multi-op categories require this. |
+| **Serial Number Series** | Either **Shared by all operators** (default) — one single series for the whole station — or **One series per operator**, where every operator counts their own numbers. Most contests expect a single shared series per station. |
+
+Serial numbers are handed out by the server, so the same number is never used twice even when several operators log at the same time. See [Serial Number Reservation](logging.md#serial-number-reservation) for how this looks in the logging engine.
+
+!!! note
+    The server needs a working cache to hand out serial numbers (`cache_adapter` in `application/config/config.php` — APCu, Redis/Valkey, Memcached or file). Without it, the logger falls back to counting from the QSOs it already knows about, which can produce duplicate numbers in multi-operator sessions. An error is written to the Wavelog log when a session with serial numbers is opened and no cache is available. Any
+    other cache then `file` is recommended for performance reasons.
+
 ### Session Notes
 
 A free-text comment shown in the contest list. Use it to note the band, your setup, the club callsign used, or anything else relevant.

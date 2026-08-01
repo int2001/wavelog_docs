@@ -26,7 +26,7 @@ The main entry form and QSO list in one panel.
 |-------|-------------|
 | **Callsign** | The callsign of the station worked. DXCC and callbook lookup triggers automatically as you type. |
 | **RST S / RST R** | Signal report sent and received. Pre-filled with 59. These fields are skipped when pressing Tab. |
-| **Nr. S / Nr. R** | Serial number sent and received. Visible only when the session has the Serial Number exchange field enabled. Nr. S is auto-incremented. |
+| **Nr. S / Nr. R** | Serial number sent and received. Visible only when the session has the Serial Number exchange field enabled. Nr. S is auto-incremented and can gets reserved in multi op contests — see [Serial Number Reservation](#serial-number-reservation). |
 | **Grid S / Grid R** | Grid square sent and received. Visible only when the session has the Grid Square exchange field enabled. |
 | **Exch S / Exch R** | Free-text exchange sent and received. Visible only when the session has the Exchange (text) field enabled. |
 
@@ -156,3 +156,30 @@ The red **End Session** button closes the logging engine and returns you to the 
 When the session is operated from a club station, all operators logged into the same Wavelog instance share the same QSO list in real time. New QSOs logged by any operator appear immediately in all open logging engine windows. The Operator column in the Recent QSOs list shows who logged each QSO.
 
 Each operator can only edit or delete QSOs they personally logged. If you have more multiple operators, we recommend using the Wavelog Worker Backend to reduce load on the server. More Information about the Worker can be found in the [Wavelog Worker documentation](../../wavelog-worker/index.md).
+
+### Serial Number Reservation
+
+When several operators log into the same session at the same time, they would otherwise all see the same "next" serial number and hand it out twice. To prevent this, the server reserves serial numbers per operator.
+
+The number in **Nr. S** has two states, shown by its colour (club stations only):
+
+| Colour | Meaning |
+|--------|---------|
+| Red | Preview. This is only an estimate of the next number — another operator may still take it. |
+| Green | Reserved. This number belongs to you and is not offered to anybody else. |
+
+The reservation is requested as soon as you commit to a QSO, which is either
+
+- pressing `Space` in the callsign field, or
+- clicking or tabbing into one of the received exchange fields (Nr. R, Exch R, Grid R).
+
+From that moment the number is yours. When the QSO is saved, it is used up and the next operator continues from there. If you clear the form with `Escape` instead of logging, the number is given back and can be used again.
+
+If you overwrite Nr. S by hand with a higher number, the series continues from that number after the QSO is saved, so the same value is never handed out again. While this is possible, it is not recommended as it can lead to gaps in the serial number sequence.
+
+Two badges next to the **Nr. S** label show how the session counts, matching the [session settings](management.md#serial-numbers):
+
+- **per band** — the series restarts on each band
+- **per op** — every operator has their own series
+
+With the Wavelog Worker enabled, other operators see the updated preview immediately. Without it, the preview updates on the next heartbeat.
