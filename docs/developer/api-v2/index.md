@@ -381,9 +381,26 @@ blanked, not `null`, the key is simply absent. An empty array (the default)
 discloses everything.
 
 Currently this affects the [Club](club.md#the-member-object) resource, the only
-one that returns another user's account data. The fields that address and grade
-a member — `user_id`, `callsign` and `permission_level` — are always returned;
-anything else may be withheld.
+one that returns another user's account data.
+
+Fields which are always returned and **cannot** be withheld are:
+
+```text
+user_id
+user_callsign
+permission_level
+```
+
+Fields which can be withheld are:
+
+```text
+user_firstname
+user_lastname
+user_locator
+user_name
+user_email
+user_language
+```
 
 !!! warning "For clients: treat the optional fields defensively"
     You cannot tell from the outside what an instance is configured to
@@ -395,7 +412,7 @@ anything else may be withheld.
 
 The API answers `OPTIONS` preflight requests with `204 No Content` and permits
 cross-origin calls (`Access-Control-Allow-Origin: *`) for the `GET`, `POST`,
-`PUT`, `PATCH`, `DELETE` and `OPTIONS` methods, allowing the `Authorization`,
+`PATCH`, `DELETE` and `OPTIONS` methods, allowing the `Authorization`,
 `Content-Type` and `X-API-Key` headers.
 
 ### Status endpoint
