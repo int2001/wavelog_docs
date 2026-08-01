@@ -90,6 +90,13 @@ Filters (all optional):
 | `mode` | — | Mode/submode filter, e.g. `SSB` or `FT8` (matches the main mode or the submode) |
 | `qsl_filter` | — | Comma list of `lotw`, `qsl`, `eqsl`, `qrz`, `clublog` (OR-combined) |
 | `since_id` | `0` | Only QSOs whose primary key is greater than this |
+| `qso_since` | — | `YYYY-MM-DD`, oldest QSO date to include (the whole day counts) |
+| `qso_until` | — | `YYYY-MM-DD`, newest QSO date to include (the whole day counts) |
+
+`qso_since` and `qso_until` filter on the **QSO date**, are inclusive on both ends
+and can be used on their own or as a pair. They are independent of `since_id`, which
+walks the database primary key for incremental syncing. A malformed date returns
+`400 validation_error`.
 
 !!! note "Clubstation tokens see only their own QSOs"
     For a [clubstation](clubstation.md) token below officer level the list is
@@ -124,6 +131,12 @@ curl "https://<WAVELOG_URL>/index.php/api/v2/qso?band=20m&station_id=1&per_page=
      -H "Authorization: Bearer wl2_your_token_here"
 ```
 
+```bash
+# Everything logged in June 2026
+curl "https://<WAVELOG_URL>/index.php/api/v2/qso?qso_since=2026-06-01&qso_until=2026-06-30" \
+     -H "Authorization: Bearer wl2_your_token_here"
+```
+
 ```json
 {
   "data": [ { "id": 4886, "call": "N9EAT" } ],
@@ -142,7 +155,7 @@ pagination state — `total`, `total_pages` and `has_more` — so you can page u
 
 Renders the **same filtered result set** as the list above, but as ADIF instead of
 JSON — so all the [list filters](#list-qsos) (`station_id`, `callsign`, `band`,
-`mode`, `qsl_filter`, `since_id`) apply. This is the v2 equivalent of the v1
+`mode`, `qsl_filter`, `since_id`, `qso_since`, `qso_until`) apply. This is the v2 equivalent of the v1
 `get_contacts_adif` endpoint.
 
 The batch size is `per_page` — for ADIF it defaults to `1000` (up to the shared

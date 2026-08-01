@@ -84,13 +84,17 @@ and can be combined:
 | `type` | all | Comma-separated list of `lotw`, `eqsl`, `qsl`, `qrz`, `clublog` |
 | `since` | none | `YYYY-MM-DD` — only confirmations **received** on or after this date |
 | `qso_since` | none | `YYYY-MM-DD` — only QSOs **made** on or after this date |
+| `qso_until` | none | `YYYY-MM-DD` — only QSOs **made** on or before this date |
 | `band` | all | A band such as `20m`, or `SAT` for satellite QSOs |
 | `mode` | all | A mode or submode, e.g. `CW` or `FT8` |
 
 `since` and `qso_since` answer different questions. `since` filters on the date a
 confirmation arrived — "how many confirmations came in this week" — and is applied
-per type against that type's own received-date column. `qso_since` filters on the
-date of the QSO itself — "how many of my QSOs since January are confirmed".
+per type against that type's own received-date column. `qso_since`/`qso_until` filter
+on the date of the QSO itself — "how many of my QSOs since January are confirmed", or
+paired, "how did last year's contest QSOs end up being confirmed". Both ends are
+inclusive and can be used on their own. They are the same filters as on the
+[QSO list](qso.md#list-qsos).
 
 An invalid `type` value or a malformed date returns `400 validation_error`. Note
 that HRDLog is **not** a confirmation type: Wavelog only uploads to it, there is
@@ -136,6 +140,7 @@ curl "https://<WAVELOG_URL>/index.php/api/v2/statistic?profile=confirmations&typ
         "type": ["lotw", "eqsl"],
         "since": "2026-07-01",
         "qso_since": null,
+        "qso_until": null,
         "band": null,
         "mode": null
       }
