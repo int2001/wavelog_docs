@@ -364,6 +364,33 @@ the `api_v2_` prefix. Both are configured independently.
 To disable rate limiting entirely, set `$config['api_rate_limits'] = null;` or
 leave it commented out.
 
+### Withheld user data
+
+Endpoints that describe **other people's accounts** disclose personal data, and
+what an instance may hand out differs per country. The instance owner therefore
+picks which of those fields to withhold:
+
+```php
+// application/config/config.php
+// Docker installations: application/config/docker/config.php
+$config['apiv2_hide_userdata'] = ['user_email', 'user_locator'];
+```
+
+The listed fields are left **out of the response entirely** — they are not
+blanked, not `null`, the key is simply absent. An empty array (the default)
+discloses everything.
+
+Currently this affects the [Club](club.md#the-member-object) resource, the only
+one that returns another user's account data. The fields that address and grade
+a member — `user_id`, `callsign` and `permission_level` — are always returned;
+anything else may be withheld.
+
+!!! warning "For clients: treat the optional fields defensively"
+    You cannot tell from the outside what an instance is configured to
+    disclose, and there is no endpoint that reports it. Check that a field is
+    present before you use it, and do not build a feature that only works when
+    an instance happens to hand out email addresses.
+
 ### CORS
 
 The API answers `OPTIONS` preflight requests with `204 No Content` and permits

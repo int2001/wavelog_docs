@@ -120,9 +120,11 @@ this list — it has exactly one club, so `GET /api/v2/club` returns that club's
 members.
 
 !!! warning
-    The response contains every member's **email address** alongside their name
-    and locator, and `club:write` lets a token hand out officer rights. Neither
-    scope should be given to a third-party tool lightly.
+    By default the response contains every member's **email address** alongside
+    their name and locator, and `club:write` lets a token hand out officer
+    rights. Neither scope should be given to a third-party tool lightly. As the
+    instance owner you can withhold the personal fields — see
+    [Withheld user data](index.md#withheld-user-data).
 
 ## The member object
 
@@ -150,6 +152,13 @@ members.
 | `user_email` | Member's email address |
 | `permission_level` | Clubstation permission level: `3`, `6` or `9` |
 | `user_language` | Member's UI language |
+
+!!! warning "Fields may be missing"
+    An instance owner can withhold the personal fields — everything except
+    `user_id`, `callsign` and `permission_level` — to comply with the privacy
+    rules they are subject to. A withheld field is **absent** from the object,
+    not empty. Check that a field is there before using it; see
+    [Withheld user data](index.md#withheld-user-data).
 
 ## List the members
 
