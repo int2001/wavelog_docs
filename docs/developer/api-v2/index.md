@@ -371,8 +371,6 @@ what an instance may hand out differs per country. The instance owner therefore
 picks which of those fields to withhold:
 
 ```php
-// application/config/config.php
-// Docker installations: application/config/docker/config.php
 $config['apiv2_hide_userdata'] = ['user_email', 'user_locator'];
 ```
 
