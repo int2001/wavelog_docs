@@ -161,6 +161,7 @@ nav = [
       "developer/api-v2/station.md",
       "developer/api-v2/radio.md",
       "developer/api-v2/statistic.md",
+      "developer/api-v2/confirmation.md",
       "developer/api-v2/lookup.md",
       "developer/api-v2/club.md",
       "developer/api-v2/token.md",

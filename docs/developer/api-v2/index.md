@@ -34,7 +34,7 @@ https://<your-wavelog-host>/index.php/api/v2/<resource>[/<id>]
 ```
 
 - `<resource>` is a singular, lowercase name (`qso`, `station`, `radio`, `statistic`,
-  `lookup`, `club`, `token`).
+  `confirmation`, `lookup`, `club`, `token`).
 - `<id>` is the numeric primary key of a single item, where applicable.
 
 That is the **complete** URL space: a path with more than those two segments is
@@ -59,6 +59,7 @@ segment. All examples in this documentation include it for maximum compatibility
 | [Station](station.md) | `/api/v2/station` | `station:*` | Manage station locations (logbook profiles) |
 | [Radio](radio.md) | `/api/v2/radio` | `radio:*` | Push and read live CAT radio state |
 | [Statistic](statistic.md) | `/api/v2/statistic` | `statistic:read` | Read-only counters for dashboards & monitoring |
+| [Confirmation](confirmation.md) | `/api/v2/confirmation` | `confirmation:read` | List QSL confirmations per QSO (LoTW, eQSL, QSL card, QRZ, Clublog) |
 | [Lookup](lookup.md) | `/api/v2/lookup` | `lookup:read` | Look up a callsign (DXCC + worked/confirmed) or a gridsquare |
 | [Club](club.md) | `/api/v2/club` | `club:read` | List a clubstation's members (officers only) |
 | [Token](token.md) | `/api/v2/token` | — | Metadata about the current token (whoami) |
@@ -126,6 +127,7 @@ The full set of scopes offered when creating a token is:
 | `station:read` / `station:write` / `station:delete` | Read / create+update / delete station locations |
 | `radio:read` / `radio:write` / `radio:delete` | Read / create+update / delete radios |
 | `statistic:read` | Read statistics |
+| `confirmation:read` | Read QSL confirmations |
 | `lookup:read` | Look up callsigns and grids |
 | `club:read` | Read club members |
 
