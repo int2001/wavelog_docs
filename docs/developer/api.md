@@ -2,6 +2,11 @@
 
 <img width="1307" alt="image" src="https://github.com/wavelog/wavelog/assets/1410708/aaf91999-a2e9-4aba-9f34-d9cb3f16dde9">
 
+!!! tip
+    A newer, resource-oriented **[REST API v2](api-v2/index.md)** is also available
+    (Bearer tokens, granular scopes, standard HTTP verbs). This page documents the
+    original v1 API, which remains fully supported.
+
 The Wavelog API allows you to interact with Wavelog via third-party tools, this might be radios, external logging applications or programs, you can generate two types of keys read-only or read/write depending on your requirements.
 
 At any time you can come to this section and delete keys to remove access.
@@ -20,6 +25,14 @@ At any time you can come to this section and delete keys to remove access.
 ### API endpoint
 
 The API URL is composed of the base url of the application (example: `https://log.example.com/`) plus the API endpoint (example: `api/qso`). The final URL should be something like: `https://log.example.com/api/qso`.
+
+### API Rate-Limiting
+
+Keep in mind, that your instanceowner may have set a [rate-limit](https://docs.wavelog.org/getting-started/hints-and-tips/#api-ratelimiting-requires-wavelog-v223-at-least) for some Endpoints. Use the APIs in a polite manner. Means: Do not call them without need for it.
+e.g.:
+
+- `/api/radio` - post to it, when frequency/mode changes. Not blind every second
+- `/api/get_contacts_adif` - it's designed for delta-loads. no need to crawl the whole log every minute.
 
 ## Available APIs
 
@@ -55,12 +68,12 @@ Whenever you post QSOs to the API (via WavelogGate, via WSJT-X Improved, via $to
 
 This function allows you to stream json-embedded ADIF Exports from Wavelog for integration with 3rd-party software.
 
-Payload to be sent to the API endpoint:
+Minimal-Payload to be sent to the API endpoint:
 
 ```json
 {
     "key": "YOUR_API_KEY",   // API-Key, read-only at least
-    "station_id": "Station Profile ID Number",  // Station ID for the station that we want to pull QSOs from
+    "station_id": "Station Profile ID Number",  // Station ID for the station that we want to pull QSOs from. WL > V2.5.1 supports also an Array here
     "fetchfromid": 0  // Internal database primary inside Wavelog of the last pulled QSO. Start at 0 to get all QSOs.
 }
 ```
@@ -75,6 +88,34 @@ Example of API response:
     "adif": "ADIF STRING"  // ADIF file with all qsos since your last pull
 }
 ```
+
+Full-Parameter-Set (for WL-Versions >2.4)
+
+```json
+  {
+    "key": "your-api-key", // API-Key, read-only at least
+    "station_id": 1, // Station ID for the station that we want to pull QSOs from. WL > V2.5.1 supports also an Array here
+    "fetchfromid": 0, // Internal database primary inside Wavelog of the last pulled QSO. Start at 0 to get all QSOs.
+    "qsl_filter": ["lotw"], // Optional QSL-Filter (Received). Possible values are: "lotw","eqsl","qsl","clublog"
+    "output_format": "json", // Optional Format-Filter. Default ADIF within JSON. if set to JSON the fields (see next) are coming as JSON
+    "fields": ["CALL", "DXCC", "QSO_DATE", "LOTW_QSLRDATE"], // Optional Fields which should be returned by JSON. Any ADIF-field is taken
+    "band": "SAT", // Optional Band-Filter
+  }
+```
+
+Note: From Wavelog-Versions >2.5.1 you can also pass an array to station_id (e.g. `...,"station_id":[1,2]...`) to fetch from multiple station_ids instead of crawling every single one.
+
+whereas:
+
+- `output_format` is default ADIF (if omitted or explicitly set)
+- if it's set to JSON, it emits the ADIF-Fields passed via the `fields` array as json.
+- if it's set to ADIF, passed `fields` are ignored
+- qsl_filter: default empty (behaves as before, doesn't take care of QSL). allowed values (besides omitting) are:
+`'lotw', 'qsl', 'eqsl', 'clublog'`. Please parse them as an array (yes, even if you pass only one) - they behave as an OR-Filter. Multiple methods can be combined. it checks if a cnf has happened.
+- band: Optional-Bandfilter. Takes 1 band (not array). Default/omitted: Any Band
+
+Additional Info:
+Result for JSON is always unique on the selected fields
 
 ### `api/radio`
 
@@ -197,14 +238,42 @@ Returns information about stations (logbook locations) belonging to the user who
     "station_gridsquare": "JO30OO",
     "station_callsign": "DJ7NT",
     "station_active": "1"
+    "station_uuid": "cc997421-653a-7799-8c9c-23faffe7723",
+    "station_city": "Bonn",
+    "station_iota": "",
+    "station_sota": "",
+    "station_wwff": "",
+    "station_pota": "",
+    "station_sig": "",
+    "station_sig_info": "",
+    "station_dxcc": "230",
+    "station_cnty": "",
+    "station_cq": "14",
+    "station_itu": "28",
+    "station_state": "",
+    "station_country": "FEDERAL REPUBLIC OF GERMANY"
   },
   {
     "station_id": "2",
     "station_profile_name": "JO30oo / DO7INT",
     "station_gridsquare": "JO30OO",
     "station_callsign": "DO7INT",
-    "station_active": null
-  }
+    "station_active": null,
+    "station_uuid": "aa9974bb-cc3a-77f0-8c6c-62fcea5a7799",
+    "station_city": "Bonn",
+    "station_iota": "",
+    "station_sota": "",
+    "station_wwff": "",
+    "station_pota": "",
+    "station_sig": "",
+    "station_sig_info": "",
+    "station_dxcc": "230",
+    "station_cnty": "",
+    "station_cq": "14",
+    "station_itu": "28",
+    "station_state": "",
+    "station_country": "FEDERAL REPUBLIC OF GERMANY"
+  },
 ]
 ```
 
@@ -465,7 +534,8 @@ Example Payload:
   "hrdlogrealtime": "0",
   "station_uuid": "12345678-1234-1234-1234-123456789012",
   "eqsl_default_qslmsg": "Testing --&gt; Good signal & nice QSO",
-  "link_active_logbook": "1"
+  "link_active_logbook": "1",
+  "qrzapikey": "valid-payed-qrz-key" // From Wavelog >V2.5.1 on
  }
 ]
 ```

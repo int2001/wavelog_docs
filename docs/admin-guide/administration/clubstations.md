@@ -74,6 +74,12 @@ To set up a Clubstation, you need to be a Wavelog Admin with access to the `conf
 
     Added users can now access the Clubstation with their assigned permission level.
 
+    !!! tip "Managing permissions through the API"
+        The same can be done over the REST API instead of this page — see the
+        [Club resource](../../developer/api-v2/club.md). A Club Officer needs a
+        token created from inside a Clubstation session; as an Administrator you
+        can use your own personal token and name the club with `?club_id=`.
+
 ---
 
 ### Accessing a Clubstation
@@ -93,6 +99,10 @@ To switch back, either **log out and log in again** or use the **"Switch back to
 ### API Keys and Radios
 
 Each user who switches into a Clubstation can have their own API keys and radios. Club Members can only see the API keys and radios they created themselves. Club Officers can see all API keys, including who created them, though the keys of others are masked.
+
+Removing a user from the Clubstation also deletes the API keys, API tokens and radios they created for it. Their personal account, their own API keys and tokens and the QSOs they logged under the club callsign are not affected. Re-adding the user restores their permission, but not their keys and tokens — those have to be created again.
+
+The same applies when you convert a Clubstation back into a normal account: all memberships end, so the keys, tokens and radios every member created for it are removed along with them.
 
 <img width="1259" alt="API Keys and Radios" src="https://github.com/user-attachments/assets/e7d1f39e-58a6-423f-85fe-d8c14fb7a4cb" />
 

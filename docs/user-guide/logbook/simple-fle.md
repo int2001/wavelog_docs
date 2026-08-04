@@ -7,6 +7,7 @@ SimpleFLE ("Simple Fast Log Entry") is a syntax-based way to log multiple QSOs w
 - [Textarea and Syntax](#textarea-and-syntax)
   - [Change band and/or mode](#change-band-andor-mode)
   - [Change date](#change-date)
+  - [Timezone offset](#timezone-offset)
   - [Add a QSO](#add-a-qso)
     - [Time](#time)
     - [Callsign](#callsign)
@@ -90,6 +91,15 @@ Another way to change the date is by typing it directly in the format YYYY-MM-DD
 date 2024-05-21
 ```
 
+#### Timezone offset
+
+By default all times are entered in UTC. If you logged your QSOs in local time, declare the offset once with `TIMEZONE` (or the short form `TZOFS`) followed by the signed hour offset (`+2`, `-5`, ...). All following QSO times are then converted to UTC until you set a different offset.
+
+```text
+TIMEZONE +2
+1400 dj3ce      -> QSO logged at 14:00 local time is stored as 12:00 UTC
+```
+
 ### Add a QSO
 
 Adding QSOs is quite simple. Just type at least the required segments and add information accordingly.  
@@ -130,7 +140,7 @@ The signal report is divided into two segments: `RST(s)` and `RST(r)` (in this o
 
 ```text
 40m lsb
-1337 DJ7NT        -> No RST. SFLE will use default RST for the used mode. E.g. 59 for SSB, 599 for CW and 0db for FT8
+1337 DJ7NT        -> No RST. SFLE will use default RST for the used mode. E.g. 59 for SSB, 599 for CW and +0 dB for FT8
 
 ft8
 42 DF2ET -4 -12   -> Because we defined the mode as FT8, the reports are -4dB (sent) and -12dB (rcvd)
@@ -191,11 +201,10 @@ Use a prefix comma (`,`) to denote sent exchange and a period (`.`) for received
 2116 dn5ce ,3.123.AS     <-- Sent 3 and EU (persisted!), received 123 and AS
 ```
 
-To clear the sent exchange use `,-`. To enable incrementing the sent serial automatically, use `,++` and disable it with `,+0`:
+To clear the sent exchange use `,-`. To enable incrementing the sent serial automatically, add `,++` together with an initial sent exchange on a QSO line (it does not work on a line of its own), and disable it with `,+0`:
 
 ```text
-80m ,++                  <-- Set autoincrement
-2110 dn5ce .73 ,1,EU     <-- Sent 1 and EU, received 73
+2110 dn5ce ,++,1,EU .73  <-- Enable autoincrement, initial sent 1 and EU, received 73
 2112 dn5ce .72           <-- Sent 2 and EU, received 72
 2116 dn5ce ,             <-- Sent 3 and EU, no received exchange
 2117 dn5ce ,-,8          <-- Sent 8 and no string - first all sent exchange is cleared, then the serial is set
@@ -220,10 +229,6 @@ Using the comment-syntax, all implemented ADIF-fields may be set by naming the f
 The field `tx_pwr` and fields starting with `my_` are retained and _not reset_ between QSOs - setting an empty value resets the field. Some `my_`-fields **will be overwritten** by station-location details.
 
 ADIF-exports may include fields not visible in Wavelog, like `sfi` or `rx_pwr` from the example.
-
-## Development Progress
-
-Currently in work is a "Callbook Lookup" feature to lookup callsigns automatically [from the set callbook](../../user-guide/integrations/callsign-lookup.md).
 
 ***
 

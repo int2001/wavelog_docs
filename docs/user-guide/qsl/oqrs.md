@@ -1,136 +1,114 @@
-# OQRS - Online QSL Request System
+# OQRS — Online QSL Request System
 
-What is OQRS?
-The Online QSL Request System (OQRS) is a convenient web-based service that allows amateur radio operators to request QSL cards for confirmed contacts (QSOs) without the need to send a traditional paper QSL or postal mail. It streamlines the process by allowing users to:
+The Online QSL Request System lets other operators request a QSL card for a confirmed contact through a public web page, instead of sending a paper card or an email. It:
 
-* Submit QSL requests electronically
-* Choose between direct or bureau QSL options
-* Save time, reduce postage costs, and improve accuracy
+* accepts QSL requests electronically,
+* offers direct or bureau delivery,
+* and saves time, postage and transcription errors.
 
-OQRS is commonly used by DXpeditions, contest stations, and operators with high QSO volumes to manage QSLing efficiently while offering a reliable service to those who want confirmation of their contacts.
+OQRS is mostly used by DXpeditions, contest stations and operators with high QSO volumes, but it works just as well for a normal station.
 
-# How to enable
+Requests you receive land under `User menu -> OQRS Requests`, with a badge showing how many are still open. From there they flow into the [QSL Queue](qsl-queue.md) for printing.
 
-* Go to station setup
-* Edit visitor site and fill a slug to be used in the url. This can be your callsign if you want. Click save when done.
-* Edit the locations, and enable OQRS for those locations where you want to use OQRS.
+## Enabling OQRS
 
-# User Options
+1. Go to **Station Setup**.
+2. Edit the **visitor site** and set a slug to be used in the URL — your callsign is a good choice. Save.
+3. Edit your station locations and enable **OQRS** for each location you want to offer it for.
 
-## Global text
+Your public page is then reachable at `[WAVELOG URL]/oqrs/[SLUG]`.
 
-The text set here, will be shown at the top of the public OQRS page.
+!!! note
+    OQRS can be switched off instance-wide with `$config['disable_oqrs'] = true;` in `config.php`.
 
-## Grouped search
+## User options
 
-When enabled, all locations enabled for the user will be searched. If disabled, the user must select the location to search.
+These apply to your account as a whole.
 
-## Show station location name in grouped search results
+**Global text** — shown at the top of your public OQRS page.
 
-When enabled, the name of the location will be show in the QSO search result table.
+**Grouped search** — when enabled, a visitor searches all your enabled locations at once. When disabled, they must first pick a location.
 
-## Automatic OQRS matching
+**Show station location name in grouped search results** — adds the location name to the result table.
 
-If disabled, you need to manually check the log and add the label for printing.
+**Automatic OQRS matching** — see [What is automatch?](#what-is-automatch) below. If disabled, you have to look up each request in your log by hand.
 
-# Location Options
+## Station location options
 
-## OQRS Enabled
+These are set per location under `Station Setup -> edit location`.
 
-To enable OQRS for a location, set this to on.
+| Option | Effect |
+|---|---|
+| **OQRS Enabled** | Offer OQRS for this location |
+| **OQRS Email alert** | Send you an email when a request arrives. Requires email to be configured under Admin -> Global Options; the mail goes to the address in your user preferences |
+| **OQRS Text** | QSL information shown to visitors who select this location |
 
-## OQRS Email alert
+## The OQRS widget
 
-Email must be set up in the client for this to work. Once this option is enabled, you will receive an email when someone submits an OQRS. The email will be sent to the email set in your user preferences.
+The public request form can be embedded in a QRZ.com bio or any other page that allows iframes:
 
-## OQRS Text
+```html
+<iframe name="iframe" src="[WAVELOG URL]/widgets/oqrs/[SLUG]" height="220" width="670" frameborder="0"></iframe>
+```
 
-If you want some text to be displayed for this location when a user enters the OQRS for this location.
+!!! note
+    The widget is not responsive yet. Stick close to `height="220" width="670"` and adjust carefully.
 
-## Add iframe of OQRS Request
+Options are passed as GET parameters. Currently available:
 
-Simple iFrame Widget which can be placed in a QRZ.com Bio or on any other website which allows iframes
-image:
+* `theme` — render the widget in one of Wavelog's themes, e.g. `[WAVELOG URL]/widgets/oqrs/[SLUG]?theme=darkly`
 
-To use this widget place it somewhere with this iframe code:
+The widget logo links to the <a href="https://github.com/wavelog/wavelog" target="_blank" rel="noopener noreferrer">Wavelog repository</a> by default.
 
-`<iframe name="iframe" src="[WAVELOG URL]/widgets/oqrs/[SLUG]" height="220" width="670" frameborder="0"></iframe>`
+## Processing requests
 
-Important
+`User menu -> OQRS Requests` is where incoming requests are handled. Filter by location, callsign and status.
 
-Due the fact that this HTML is not responsive yet I recommend to stick with height="220" width="670" in the iframe. You may have to play a little bit with these settings to find the right spot.
-Options
+Each request needs to be **matched to a QSO** in your log — that is the link that allows a label to be printed and the QSL to be marked as sent. Matched requests are added to the [QSL Queue](qsl-queue.md).
 
-The Widget is customizable. Currently available options:
+For unmatched requests, use the check-log buttons:
 
-* `theme`
+* **Call** — show all QSOs in your log for that callsign
+* **Date / Time** — show all QSOs on that date within ±3000 seconds
 
-Choose the theme widget with one of the themes in Wavelog
-Example: `theme=darkly`
+When you find the right QSO, click **Match QSO**.
 
-The Widgetlogo is a link which shows per default on Wavelog's Github Repo (<https://github.com/wavelog/wavelog>).
+Once the label is printed and the QSL is marked as sent, the request is set to *Done*. You can also set a request to done manually, or reject it.
 
-To add options just place them as GET parameter in the URL like this:
+### Statuses
 
-`[WAVELOG URL]/widgets/oqrs/[SLUG]?theme=darkly`
+| Status | Meaning |
+|---|---|
+| Open request | Needs review by you |
+| Not in log request | The visitor reported a QSO that was not found — check your log |
+| Pending | Matched and waiting to be printed and sent |
+| Done / sent | Processed, QSL sent |
+| Rejected | Will not be processed |
 
-# OQRS View
+## Typical flow
 
-View and manage submitted QSL requests.
+A visitor opens your OQRS page and is presented with either a location drop-down, or a single search box across all locations if grouped search is enabled.
 
-Filter by location, callsign and status. This is the main view where you can see the incoming OQRS requests, and process them as needed.
+After searching and filling in the form, the request is stored. With automatch enabled, Wavelog looks for the matching QSO, sets the status to *Pending* and adds a label to the print queue. Once printed and marked as sent, the request becomes *Done*. If no match is found — or automatch is off — the status is *Open request* and you match it manually as described above.
 
-## Print Label
+## FAQ
 
-The OQRS will be set to done when you print the label and mark the QSL card as sent.
-You can also use the OQRS view to set the status of a request to done.
+### What is automatch?
 
-# F.A.Q
+With automatch enabled, an incoming request is automatically linked to a QSO in your log if one is found within 30 minutes of the given time. Without it, you match every request by hand.
 
-## What is automatch?
+### Why do I need a QSO match on a request?
 
-For this to work, the automatch option needs to be on. If someone requests a QSL card, and it is found in the system within 30 minutes from the given time, it will automatically be matched to this QSO.
+Without a match there is no connection between the request and a QSO, so Wavelog cannot print a label for it or mark the QSL as sent.
 
-Without it on, you need to find and link the QSO in your logbook to the OQRS request.
+### Why is no email sent?
 
-## Why do I need to have a QSO match set on the OQRS request?
+Check that email is configured under Admin -> Global Options, that **OQRS Email alert** is enabled for the location, and that the address in your user settings is correct.
 
-You need to have a match so that the system can print a label for you, and you can have the QSL marked as sent. If no match, you have no connection between the QSO and the request.
+### A request never shows up
 
-## Why is no email sent?
+There is a duplicate check: a second request for the same date, band and mode cannot be submitted.
 
-Make sure the email is set up in the global options, and the email address is correct in the user settings.
+### What about "not in log" requests?
 
-## What does the different statuses mean?
-
-* Open request - The request is currently open, and needs to be reviewed by you.
-* Not in log request - The request is not in the log, so you need to check your log and process the request.
-* Done / sent - The request has been processed and the QSL has been sent.
-* Pending - The request is still being processed.
-* Rejected - The request has been rejected and will not be processed.
-
-## What does the check log buttons do?
-
-* Call - displays all QSOs in the log for the callsign
-* Date / Time - displays all QSOs on the given date with time +- 3000 seconds
-
-## The request never shows up
-
-* A duplicate check is implemented so that a new request on the same date/band and mode can't be done.
-
-## But what about not in log requests?
-
-You process them as you would any other OQRS requests. You need to check your log if you can find a QSO at all. If might be a busted call, wrong band, wrong mode, wrong date or time. Use the check log features.
-
-# OQRS Scenario
-
-The requester enters your OQRS page. The page can be presented with either:
-
-1. A dropdown to choose the location to search
-2. Just a search box to search all locations at once. This is enabled with the grouped search option.
-
-When the requester is done with searching, and have filled in necessary information, the OQRS request will be stored in the database waiting to be processed. If you have automatch enabled, Wavelog will try to find the corresponding QSO to match to the request. The status will be set to "Pending", and a label is added to the print queue. Once the label is printed and the QSL is set to sent, the request will be set as "Done". If a match is not found, the status will be set to "Open request".
-
-If automatch is disabled, the status will be set to "Open request".
-
-For "Open request", you will need to check the log with "Call" or "Date/Time" buttons. When you find the correct QSO, you click on the "Match QSO" button. The QSO will be added to the print queue, and can now be printed and sent.
+Treat them like any other request. Check whether you can find the QSO at all — it may be a busted call, or the wrong band, mode, date or time. The check-log buttons are the fastest way to look.

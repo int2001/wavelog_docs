@@ -1,49 +1,63 @@
-# QRZ Logbook Synchronisation
+# QRZ.com Logbook
 
-> Note this feature requires a paid subscription to QRZ.
-> NOTE2: This does not download QSOs from QRZ, it only downloads confirmations.
+Wavelog pushes your QSOs to the QRZ.com Logbook and downloads the confirmations QRZ holds for you.
 
-Wavelog allows QRZ Logbook QSO push, this allows you to send any QSOs logged to the third party service. Setup of this feature is simple.
+The page lives at `User menu -> Third-Party Services -> QRZ Logbook`.
 
-When creating or editing the Station Profile there is a field for the QRZ Logbook API once this is provided when you Add/Edit a QSO this information will be forwarded to QRZ Logbooks API
+!!! note "Requirements"
+    Using the QRZ Logbook API requires a **paid QRZ subscription**.
 
-Tips
+!!! warning "Wavelog does not download your log"
+    Only **confirmations** are fetched from QRZ.com. The QSO itself must already be in your Wavelog logbook — see the [overview](index.md).
 
-* If you don't know your QRZ Logbook API it can be found at [https://logbook.qrz.com/logbook](https://logbook.qrz.com/logbook)
+## Setup
 
-Wavelog also supports pulling "confirmations" out of QRZ.com since Version 1.0
+QRZ is configured **per station location** (`Station Setup -> edit location`):
 
-## Batch Down-/Uploading
+| Field | Description |
+|---|---|
+| **QRZ.com Logbook API Key** | The key for the logbook this location should upload to. Format: `XXXX-XXXX-XXXX-XXXX` |
+| **QRZ.com Logbook Upload** | *Disabled*, *Enabled* (batch upload only) or *Realtime* (push each QSO right after logging) |
 
-You can run batch down-/uploading to QRZ, this is useful in case of instances where QRZ.com is down or you have edited a QSO these are uploaded with this process. If you have enabled "Realtime-Upload" at Station-Locations, the upload-one isn't needed. If not enabled, please set it to:
+Find your API key at [logbook.qrz.com/logbook](https://logbook.qrz.com/logbook). Each QRZ logbook has its own key, so a location that logs under a different callsign needs the key of the matching logbook.
 
-```bash
-12 */6 * * * curl --silent https://<url-and-path-to-wavelog>/index.php/qrz/upload/  &>/dev/null
-18 */6 * * * curl --silent https://<url-and-path-to-wavelog>/index.php/qrz/download/  &>/dev/null
-```
+!!! warning
+    If QRZ rejects the key repeatedly (`STATUS=AUTH`), Wavelog sets that location's upload to *Disabled* to avoid hammering the API. Fix the key and re-enable it.
 
-## Mark QSOs as uploaded
+## Batch up- and download
 
-Under ADIF Import / Export you can mark your QSOs uploaded if they are already uploaded to the QRZ Logbook.
+Even with *Realtime* enabled, the batch jobs are useful: they catch up QSOs that were edited afterwards or that failed while QRZ was unreachable.
 
-# Important information about sync-logic
+Enable the jobs in the Cronmanager (`Admin -> Cron Jobs`), both default to every 6 hours:
 
-Wavelog asks QRZ for **new** QSLs after the last one which was received at Wavelog. This means - e.g.:
+* `qrz_upload` — send new and changed QSOs to QRZ
+* `qrz_download` — fetch confirmations
 
-* you have a QSO which was confirmed on 2023-01-01. Either because it was really confirmed or you marked it as confirmed (via UI or ADIF)
-* Wavelog will now ask QRZ for "QSLs" **after** 2023-01-01
+## Marking QSOs as already uploaded
 
-If there's a QSL which was sent to QSL **before** 2023-01-01 it'll never reach Wavelog.
-If you think this is wrong, there's a simple Workaround: Mark ALL your QSOs as "no QRZ-QSL" received. According to the above logic a new sync happens. This can be done in several ways:
+If you uploaded to QRZ by other means before, you can mark a date range as uploaded without sending it again — either on the QRZ page or via the *mark as uploaded* checkboxes during [ADIF import/export](../logbook/adif-import-export.md).
 
-* Use the Logbook-Advanced with its mass-edit mode (recommended way)
-* Edit the QSOs in a single-way
-* Export them, empty your Log, edit them with a editor of choice and reupload them
+## How the sync logic works
 
-Reasons for this behaviour:
+Wavelog asks QRZ for confirmations **newer than the last one it already received**. An example:
 
-* Save data and computing power.
-* An already confirmed QSO doesn't need to be confirmed again
-* QRZ processes its QSLs in a straight way. they own no time-machine. Means: Either you got NOW a QSL for a QSO which happened in the past or you'll get the QSL in the future. You'll never(!) receive a QSL which QSL-Date was in the past. Remember: They own no time-machine
+* A QSO is confirmed on 2023-01-01 — either really confirmed, or marked as confirmed by you via the UI or an ADIF import.
+* From then on, Wavelog only asks QRZ for confirmations dated **after** 2023-01-01.
 
-The same logic is used at LoTW-Confirms
+A confirmation dated *before* that will therefore never arrive.
+
+Why it works this way:
+
+* It saves bandwidth and computing power on both sides.
+* An already confirmed QSO does not need to be confirmed again.
+* QRZ processes confirmations chronologically. You either get a confirmation *now* for a past QSO, or you get it in the future — you never receive one whose date lies in the past.
+
+The same logic applies to [LoTW](lotw.md).
+
+### Workaround
+
+If you are convinced confirmations are missing, mark **all** your QSOs as *not confirmed via QRZ*. The next sync then starts from scratch. You can do this by:
+
+* using the mass edit in [Logbook Advanced](../logbook/advanced-logbook.md) — the recommended way,
+* editing the QSOs one by one, or
+* exporting the log, clearing it, editing the ADIF in an editor and importing it again.

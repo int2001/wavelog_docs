@@ -11,8 +11,11 @@ This is **NOT** how to Migrate from Cloudlog to Wavelog. If you're still using C
 To update Wavelog to the latest version, run the following from your `docker-compose.yml` folder:
 
 ```bash
+# we check for any new images and pull them
 docker compose pull
-docker compose down
+
+# docker compose down is not necessary. docker recognizes any changes in images and configuration
+# and recreates any containers automatically.
 docker compose up -d
 ```
 
@@ -50,6 +53,9 @@ chown -R www-data:www-data /var/www/html
     - Check the Version in `ADMIN > DEBUG`. You should now see the correct version here aswell.
 
 ### Updating via `zip`-File
+
+!!! warning
+    If you do not follow the instructions and just overwrite your existing files this can lead to two files, if we renamed a file. So happened a lot of times with the release 2.3.1. If you facing an issue with two versions of the migration number 170, simply delete the file `170_tag_2_6_3.php` or just follow the instructions below to make a proper upgrade. We recommend using git as installation method as it causes way less headache.
 
 When using Wavelog on a Hosted Webspace you may have no access to a command line. Then you need to update your Wavelog-Installation with a downloaded `zip`-File. Follow this Step by Step to do a proper update.
 

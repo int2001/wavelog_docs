@@ -1,9 +1,7 @@
 # config.php Configuration File
 
-> Information Relating to application/config/wavelog.php
-
 !!! tip
-    For Docker-based setup, this file is located at `application/config/docker/wavelog.php`
+    For Docker-based setup, this file is located at `application/config/docker/config.php`
 
 ## Wavelog configuration file
 
@@ -11,7 +9,7 @@ This file contains most of the configuration parameters used by Wavelog for almo
 
 ### Basic configuration example
 
-A sample `config.php` file can be located at [this link](https://github.com/wavelog/wavelog/blob/master/application/config/config.sample.php), this file should be renamed to `config.php` and customized based on user need.
+A sample `config.php` file can be located at [this link](https://github.com/wavelog/wavelog/blob/master/application/config/config.sample.php), this file should be renamed to `config.php` and customized based on user need. You don't have to do this manually. The Wavelog installer will take care of the initial setup process.
 
 ### Callbooks configuration
 

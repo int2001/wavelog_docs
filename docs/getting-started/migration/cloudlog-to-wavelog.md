@@ -115,15 +115,14 @@ If your Cloudlog instance is installed by a bare ZIP File or you are using a hos
 
 - File: `application/config/config.php`
 - File: `application/config/database.php`
-- File: `application/config/cloudlog.php`
 - Folder: `uploads/`
 - Folder: `images/eqsl_card_images/`
 - Folder: `assets/qslcard/`
 - **IF EXISTS:**
 - File: `assets/js/sections/custom.js`
 
-1. Now copy these files and folders into the newly downloaded Wavelog data. You can just replace them **except cloudlog.php**. This file you need to rename to **wavelog.php**.  
-Another way would be to just log in with (S)FTP and upload the Wavelog folder and accept "Overwrite?"-Messages. But don't forget to rename the cloudlog.php file to wavelog.php.
+1. Now copy these files and folders into the newly downloaded Wavelog data.
+Another way would be to just log in with (S)FTP and upload the Wavelog folder and accept "Overwrite?"-Messages.
 2. Once this is done, you can replace the complete **Cloudlog folder** with the prepared **Wavelog folder**.
 3. Now reload the webpage. You should now see Wavelog running.
 
