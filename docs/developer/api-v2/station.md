@@ -38,6 +38,7 @@ locations.
 ```json
 {
   "id": 1,
+  "uuid": "c8904ea7-8bfa-11f1-865b-0241724b0b31",
   "name": "JO30oo / DJ7NT",
   "callsign": "DJ7NT",
   "gridsquare": "JO30OO",
