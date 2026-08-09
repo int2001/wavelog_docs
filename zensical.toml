@@ -87,6 +87,7 @@ nav = [
       ]},
     ]},
     {"Features" = [
+      "user-guide/features/activation-planner.md",
       "user-guide/features/analytics.md",
       "user-guide/features/notes.md",
       "user-guide/features/search.md",
