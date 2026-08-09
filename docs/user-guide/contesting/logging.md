@@ -26,7 +26,7 @@ The main entry form and QSO list in one panel.
 |-------|-------------|
 | **Callsign** | The callsign of the station worked. DXCC and callbook lookup triggers automatically as you type. |
 | **RST S / RST R** | Signal report sent and received. Pre-filled with 59. These fields are skipped when pressing Tab. |
-| **Nr. S / Nr. R** | Serial number sent and received. Visible only when the session has the Serial Number exchange field enabled. Nr. S is auto-incremented and can gets reserved in multi op contests — see [Serial Number Reservation](#serial-number-reservation). |
+| **Nr. S / Nr. R** | Serial number sent and received. Visible only when the session has the Serial Number exchange field enabled. Nr. S is auto-incremented and gets reserved in multi op contests — see [Serial Number Reservation](#serial-number-reservation). |
 | **Grid S / Grid R** | Grid square sent and received. Visible only when the session has the Grid Square exchange field enabled. |
 | **Exch S / Exch R** | Free-text exchange sent and received. Visible only when the session has the Exchange (text) field enabled. |
 
@@ -159,7 +159,7 @@ Each operator can only edit or delete QSOs they personally logged. If you have m
 
 ### Serial Number Reservation
 
-When several operators log into the same session at the same time, they would otherwise all see the same "next" serial number and hand it out twice. To prevent this, the server reserves serial numbers per operator.
+When several operators log into the same session at the same time, they would otherwise all see the same "next" serial number and hand it out twice. To prevent this, the server reserves each number for a single operator.
 
 The number in **Nr. S** has two states, shown by its colour (club stations only):
 

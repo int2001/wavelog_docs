@@ -87,7 +87,7 @@ Serial numbers are handed out by the server, so the same number is never used tw
 
 !!! note
     The server needs a working cache to hand out serial numbers (`cache_adapter` in `application/config/config.php` — APCu, Redis/Valkey, Memcached or file). Without it, the logger falls back to counting from the QSOs it already knows about, which can produce duplicate numbers in multi-operator sessions. An error is written to the Wavelog log when a session with serial numbers is opened and no cache is available. Any
-    other cache then `file` is recommended for performance reasons.
+    other cache than `file` is recommended for performance reasons.
 
 ### Session Notes
 
