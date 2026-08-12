@@ -6,4 +6,4 @@ Widgets are little gadgets/add-ons, which can be embedded i.e. on websites and t
 - [On-Air Widget](./on-air-widget.md)
 - [OQRS Widget](../qsl/oqrs.md)
 - [Last QSOs Widget](./last-qsos-widget.md)
-- [Last-LoTW-Uplaods Widget](./last-lotw-uploads-widget.md)
+- [Last-LoTW-Uploads Widget](./last-lotw-uploads-widget.md)
