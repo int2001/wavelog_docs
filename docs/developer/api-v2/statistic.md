@@ -61,12 +61,40 @@ curl "https://<WAVELOG_URL>/index.php/api/v2/statistic?profile=qso" \
         "by_band": [ { "band": "20m", "count": 12 } ],
         "by_mode": [ { "mode": "CW", "count": 7 } ]
       },
-      "dxcc": { "worked": 15, "confirmed": 9, "available": 340 }
+      "dxcc": {
+        "worked": 15,
+        "confirmed": 9,
+        "confirmed_paper": 6,
+        "confirmed_lotw": 7,
+        "available": 340,
+        "deleted": { "worked": 1, "confirmed_paper": 1, "confirmed_lotw": 0 }
+      }
     }
   },
   "meta": { "profile": "qso", "admin": false }
 }
 ```
+
+!!! note "New in Wavelog 3.1.1"
+    The `dxcc` block gained the paper/LoTW confirmation split and a `deleted`
+    sub-object, matching the dashboard DXCC card (PR #3663, mirroring #3656 / #3615).
+
+    - `confirmed_paper`, `confirmed_lotw`: split of `confirmed` by paper QSL
+      and by LoTW (overlap allowed, so each is `<= confirmed`).
+    - `deleted`: same three keys for DXCC entities worked but since removed
+      from the active list — shown in brackets on the card.
+    - `available` now counts only **currently active** DXCC entities (deleted
+      excluded), aligning it with the dashboard's Needed denominator.
+
+`dxcc` mirrors the dashboard DXCC card. `confirmed` counts entities confirmed
+by **paper QSL or LoTW** (combined and deduped — the card's Needed numerator);
+`confirmed_paper` and `confirmed_lotw` are the split the card shows in its
+Confirmed row, so each is `<= confirmed` while their sum may exceed it.
+`available` is the count of currently active DXCC entities (deleted ones
+excluded). `deleted` carries the same shape for entities worked but since
+removed from the active list — the bracketed figure on the card. eQSL is
+intentionally excluded from `dxcc.confirmed` even though it appears in the
+[confirmations](#confirmations) topic below.
 
 `by_band` and `by_mode` return the top entries by count.
 
