@@ -26,11 +26,14 @@ check-docker:
 image: check-docker
 	@docker build -q -t $(IMAGE) -f tests/Dockerfile . >/dev/null
 
+# The incremental cache reports phantom "page does not exist" warnings, so both
+# targets start from scratch: serve has no --clean flag, drop the cache by hand.
 serve: image
+	rm -rf $(CURDIR)/.cache
 	$(DOCKER_RUN) -i -e HOME=/tmp -p 8000:8000 -v $(CURDIR):/docs $(IMAGE) zensical serve -a 0.0.0.0:8000
 
 build: image
-	$(DOCKER_RUN) -e HOME=/tmp -v $(CURDIR):/docs $(IMAGE) zensical build --strict
+	$(DOCKER_RUN) -e HOME=/tmp -v $(CURDIR):/docs $(IMAGE) zensical build --clean --strict
 
 # Same images and arguments as the CI workflows in .github/workflows/.
 lint: check-docker
@@ -44,5 +47,5 @@ test: check-docker
 	@bash tests/run.sh
 
 clean:
-	rm -rf site .venv
+	rm -rf site .venv .cache
 	-docker rmi $(IMAGE) 2>/dev/null
