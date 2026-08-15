@@ -53,7 +53,7 @@ You now have a template you can print from, described in [§11](#11-printing-pos
 | **PDF** | Generate a **demo PDF** using a few of your recent QSOs so you can proof the design. |
 | **Undo / Redo** | Step backwards/forwards through your changes. |
 | **Zoom** − / reset / + | Zoom the canvas. Also **Ctrl + mouse wheel**. |
-| **Print offset X / Y** | Global calibration offset applied to **every** element at print time. See [§9](#9-calibration--print-offset). |
+| **Print offset X / Y** | Global calibration offset applied to **every** element at print time. See [§9](#9-calibration-print-offset). |
 
 ## 5. Placing and arranging fields
 
@@ -240,7 +240,7 @@ print run.
 - **A station's card is missing from the PDF.** That callsign had no usable mailing
   address in your callbook, so it was skipped. Look the address up and it'll appear
   next time (addresses are cached for ~20 days).
-- **Everything prints slightly off-centre.** Use **Print offset X / Y** ([§9](#9-calibration--print-offset))
+- **Everything prints slightly off-centre.** Use **Print offset X / Y** ([§9](#9-calibration-print-offset))
   rather than moving individual fields.
 - **Text runs off the card edge.** Lower the font size, or set a **Wrap width** so
   long values (addresses, comments) wrap onto multiple lines.
