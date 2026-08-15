@@ -21,5 +21,9 @@
   "MD046": false,
 
   // MD060: Table column style — pure formatting preference, too noisy for existing content
-  "MD060": false
+  "MD060": false,
+
+  // MD051: Link fragments — GitHub slugs differ from the ones zensical generates
+  // (e.g. "&" in a heading). `zensical build --strict` already validates anchors.
+  "MD051": false
 }
