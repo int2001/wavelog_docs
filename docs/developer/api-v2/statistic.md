@@ -7,6 +7,7 @@ a monitoring item or trigger.
 
 - **Base path:** `/api/v2/statistic`
 - **Scope:** `statistic:read`
+- **Since version:** <span class="wl-since">3.1.0</span>
 
 !!! note
     Read the [API v2 overview](index.md) first for authentication, the response
@@ -14,9 +15,9 @@ a monitoring item or trigger.
 
 ## Endpoint
 
-| Verb | Path | Scope | Purpose |
-| --- | --- | --- | --- |
-| `GET` | `/api/v2/statistic` | `statistic:read` | Return one or more statistics topics |
+| Verb | Path | Scope | Purpose | Since version |
+| --- | --- | --- | --- | --- |
+| `GET` | `/api/v2/statistic` | `statistic:read` | Return one or more statistics topics | <span class="wl-since">3.1.0</span> |
 
 Query parameter:
 

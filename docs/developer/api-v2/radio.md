@@ -7,6 +7,7 @@ endpoint.
 
 - **Base path:** `/api/v2/radio`
 - **Scopes:** `radio:read`, `radio:write`, `radio:delete`
+- **Since version:** <span class="wl-since">3.1.0</span>
 
 All operations are scoped to the token owner. A radio belonging to another user is
 treated as *not found*.
@@ -26,12 +27,12 @@ is **no `PATCH` or `PUT`** — every new snapshot is simply a `POST`:
 
 ## Endpoints
 
-| Verb | Path | Scope | Purpose |
-| --- | --- | --- | --- |
-| `GET` | `/api/v2/radio` | `radio:read` | List all your radios |
-| `GET` | `/api/v2/radio/{id}` | `radio:read` | Fetch a single radio |
-| `POST` | `/api/v2/radio` | `radio:write` | Create or update a radio (upsert by name) |
-| `DELETE` | `/api/v2/radio/{id}` | `radio:delete` | Remove a radio |
+| Verb | Path | Scope | Purpose | Since version |
+| --- | --- | --- | --- | --- |
+| `GET` | `/api/v2/radio` | `radio:read` | List all your radios | <span class="wl-since">3.1.0</span> |
+| `GET` | `/api/v2/radio/{id}` | `radio:read` | Fetch a single radio | <span class="wl-since">3.1.0</span> |
+| `POST` | `/api/v2/radio` | `radio:write` | Create or update a radio (upsert by name) | <span class="wl-since">3.1.0</span> |
+| `DELETE` | `/api/v2/radio/{id}` | `radio:delete` | Remove a radio | <span class="wl-since">3.1.0</span> |
 
 List endpoints are not paginated.
 
@@ -105,6 +106,21 @@ curl -X POST https://<WAVELOG_URL>/index.php/api/v2/radio \
            "power": 5
          }'
 ```
+
+!!! note "Field limits"
+    <span class="wl-since wl-since-dev">dev</span> The payload is validated against
+    the same limits the legacy [`api/radio`](../api.md#apiradio) endpoint applies,
+    before anything is stored:
+
+    - `radio`: non-empty string, at most 250 characters
+    - `frequency`, `frequency_rx`, `power`: whole numbers — a decimal or a
+      non-numeric value is refused, not rounded
+    - `mode`, `mode_rx`, `prop_mode`: at most 10 characters
+    - `sat_name`: at most 255 characters
+
+    A violation returns `400 validation_error` and names every offending field
+    in `details.invalid`, e.g. `{ "invalid": ["frequency", "mode"] }`. Before
+    this, an oversized value went straight to the database.
 
 !!! note
     The callback URL (`cat_url`) is **not** writable through the API. If you need a

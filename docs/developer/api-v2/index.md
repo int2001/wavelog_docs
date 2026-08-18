@@ -33,8 +33,8 @@ Every endpoint lives under the `api/v2` prefix:
 https://<your-wavelog-host>/index.php/api/v2/<resource>[/<id>]
 ```
 
-- `<resource>` is a singular, lowercase name (`qso`, `station`, `radio`, `statistic`,
-  `confirmation`, `lookup`, `club`, `token`).
+- `<resource>` is a singular, lowercase name (`qso`, `station`, `logbook`, `radio`,
+  `statistic`, `confirmation`, `lookup`, `club`, `token`).
 - `<id>` is the numeric primary key of a single item, where applicable.
 
 That is the **complete** URL space: a path with more than those two segments is
@@ -57,11 +57,14 @@ segment. All examples in this documentation include it for maximum compatibility
 | --- | --- | --- | --- |
 | [QSO](qso.md) | `/api/v2/qso` | `qso:*` | Read, create, update and delete log contacts; ADIF import/export |
 | [Station](station.md) | `/api/v2/station` | `station:*` | Manage station locations (logbook profiles) |
+| [Logbook](logbook.md) | `/api/v2/logbook` | `logbook:*` | Group station locations into logbooks |
 | [Radio](radio.md) | `/api/v2/radio` | `radio:*` | Push and read live CAT radio state |
 | [Statistic](statistic.md) | `/api/v2/statistic` | `statistic:read` | Read-only counters for dashboards & monitoring |
 | [Confirmation](confirmation.md) | `/api/v2/confirmation` | `confirmation:read` | List QSL confirmations per QSO (LoTW, eQSL, QSL card, QRZ, Clublog) |
+| [Contest](contest.md) | `/api/v2/contest` | `contest:*` | Manage contest sessions and their QSO links |
 | [Lookup](lookup.md) | `/api/v2/lookup` | `lookup:read` | Look up a callsign (DXCC + worked/confirmed) or a gridsquare |
 | [Club](club.md) | `/api/v2/club` | `club:read` | List a clubstation's members (officers only) |
+| [Catalog](catalog.md) | `/api/v2/catalog` | — | Instance-wide reference data (contests, DXCC entities, subdivisions) |
 | [Token](token.md) | `/api/v2/token` | — | Metadata about the current token (whoami) |
 
 ## Authentication
@@ -125,14 +128,17 @@ The full set of scopes offered when creating a token is:
 | --- | --- |
 | `qso:read` / `qso:write` / `qso:delete` | Read / create+update / delete QSOs |
 | `station:read` / `station:write` / `station:delete` | Read / create+update / delete station locations |
+| `logbook:read` / `logbook:write` / `logbook:delete` | Read / create+update / delete logbooks |
 | `radio:read` / `radio:write` / `radio:delete` | Read / create+update / delete radios |
 | `statistic:read` | Read statistics |
 | `confirmation:read` | Read QSL confirmations |
+| `contest:read` / `contest:write` / `contest:delete` | Read / create+update / delete contest sessions |
 | `lookup:read` | Look up callsigns and grids |
 | `club:read` | Read club members |
 
-The [Token](token.md) resource (whoami) needs no scope — any valid token may read
-its own metadata.
+Two resources need no scope at all — any valid token may read them: [Token](token.md)
+(whoami, its own metadata) and [Catalog](catalog.md), which serves instance-wide
+reference data rather than user data.
 
 Scopes are the *only* permission layer for a personal token. A
 [clubstation](clubstation.md) token passes a second one on top: the member's
@@ -464,9 +470,9 @@ curl -X POST https://<WAVELOG_URL>/index.php/api/v2/qso \
 ```
 
 See the per-resource pages for the full field reference:
-[QSO](qso.md) · [Station](station.md) · [Radio](radio.md) ·
-[Statistic](statistic.md) · [Lookup](lookup.md) ·
-[Club](club.md) · [Token](token.md).
+[QSO](qso.md) · [Station](station.md) · [Logbook](logbook.md) · [Radio](radio.md) ·
+[Statistic](statistic.md) · [Contest](contest.md) · [Lookup](lookup.md) ·
+[Club](club.md) · [Catalog](catalog.md) · [Token](token.md).
 
 If your token belongs to a clubstation rather than to your own account, read
 [Clubstations](clubstation.md) as well — the permission level changes what

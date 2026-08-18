@@ -7,6 +7,7 @@ token owner's own logbook. The callsign lookup is the v2 equivalent of the v1
 
 - **Base path:** `/api/v2/lookup`
 - **Scope:** `lookup:read`
+- **Since version:** <span class="wl-since">3.1.0</span>
 
 !!! note
     Read the [API v2 overview](index.md) first for authentication, the response
@@ -14,11 +15,11 @@ token owner's own logbook. The callsign lookup is the v2 equivalent of the v1
 
 ## Endpoints
 
-| Verb | Path | Scope | Purpose |
-| --- | --- | --- | --- |
-| `GET` | `/api/v2/lookup?callsign=…` | `lookup:read` | Look up a callsign |
-| `GET` | `/api/v2/lookup?grid=…` | `lookup:read` | Look up a gridsquare's worked/confirmed status |
-| `GET` | `/api/v2/lookup?grid=all` | `lookup:read` | List all worked gridsquares |
+| Verb | Path | Scope | Purpose | Since version |
+| --- | --- | --- | --- | --- |
+| `GET` | `/api/v2/lookup?callsign=…` | `lookup:read` | Look up a callsign | <span class="wl-since">3.1.0</span> |
+| `GET` | `/api/v2/lookup?grid=…` | `lookup:read` | Look up a gridsquare's worked/confirmed status | <span class="wl-since">3.1.0</span> |
+| `GET` | `/api/v2/lookup?grid=all` | `lookup:read` | List all worked gridsquares | <span class="wl-since">3.1.0</span> |
 
 The callsign is always passed as a query parameter, never as a path segment —
 `/api/v2/lookup/DL1ABC` returns `404 not_found`, because Lookup has no
