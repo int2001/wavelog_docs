@@ -7,6 +7,11 @@
     (Bearer tokens, granular scopes, standard HTTP verbs). This page documents the
     original v1 API, which remains fully supported.
 
+!!! tip
+    Try the API v1 endpoints interactively with the [Legacy API tester](wlapi.html)
+    (static tool, runs entirely in your browser, API key never leaves it except
+    for requests to your instance).
+
 The Wavelog API allows you to interact with Wavelog via third-party tools, this might be radios, external logging applications or programs, you can generate two types of keys read-only or read/write depending on your requirements.
 
 At any time you can come to this section and delete keys to remove access.
