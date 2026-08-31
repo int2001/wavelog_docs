@@ -6,6 +6,7 @@ the same data layer as the web UI, applying the same normalisation and validatio
 
 - **Base path:** `/api/v2/station`
 - **Scopes:** `station:read`, `station:write`, `station:delete`
+- **Since version:** <span class="wl-since">3.1.0</span>
 
 All operations are scoped to the token owner. A station location belonging to
 another user is treated as *not found*.
@@ -16,13 +17,13 @@ another user is treated as *not found*.
 
 ## Endpoints
 
-| Verb | Path | Scope | Purpose |
-| --- | --- | --- | --- |
-| `GET` | `/api/v2/station` | `station:read` | List all your station locations |
-| `GET` | `/api/v2/station/{id}` | `station:read` | Fetch a single station location |
-| `POST` | `/api/v2/station` | `station:write` | Create a station location |
-| `PATCH` | `/api/v2/station/{id}` | `station:write` | Partial update |
-| `DELETE` | `/api/v2/station/{id}` | `station:delete` | Delete a station location and all its QSOs |
+| Verb | Path | Scope | Purpose | Since version |
+| --- | --- | --- | --- | --- |
+| `GET` | `/api/v2/station` | `station:read` | List all your station locations | <span class="wl-since">3.1.0</span> |
+| `GET` | `/api/v2/station/{id}` | `station:read` | Fetch a single station location | <span class="wl-since">3.1.0</span> |
+| `POST` | `/api/v2/station` | `station:write` | Create a station location | <span class="wl-since">3.1.0</span> |
+| `PATCH` | `/api/v2/station/{id}` | `station:write` | Partial update | <span class="wl-since">3.1.0</span> |
+| `DELETE` | `/api/v2/station/{id}` | `station:delete` | Delete a station location and all its QSOs | <span class="wl-since">3.1.0</span> |
 
 !!! note "There is no `PUT`"
     Updates are always partial, for the same reason as on [QSO](qso.md): Wavelog
@@ -144,6 +145,23 @@ curl -X PATCH https://<WAVELOG_URL>/index.php/api/v2/station/1 \
 ```
 
 The updated station object is returned in `data`.
+
+!!! note "Switching the active station location"
+    <span class="wl-since wl-since-dev">dev, not released yet</span> `set_active: true` additionally
+    makes this location the owner's active one — the one new QSOs and the web UI
+    default to:
+
+    ```bash
+    curl -X PATCH https://<WAVELOG_URL>/index.php/api/v2/station/2 \
+         -H "Authorization: Bearer wl2_your_token_here" \
+         -H "Content-Type: application/json" \
+         -d '{ "set_active": true }'
+    ```
+
+    It is deliberately a different key from the read-only `active` in the
+    response, so a `GET` result can be sent straight back through `PATCH`
+    without silently reassigning your active location. A body containing
+    nothing but `set_active` is valid.
 
 !!! note "Required fields cannot be blanked out"
     The fields required on create stay required for the lifetime of the

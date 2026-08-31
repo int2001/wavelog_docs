@@ -6,6 +6,7 @@ and teardown on delete all behave exactly as they do in Wavelog itself.
 
 - **Base path:** `/api/v2/qso`
 - **Scopes:** `qso:read`, `qso:write`, `qso:delete`
+- **Since version:** <span class="wl-since">3.1.0</span>
 
 All operations are scoped to the token owner's station locations. A QSO that does
 not belong to one of them is treated as *not found*.
@@ -17,13 +18,13 @@ not belong to one of them is treated as *not found*.
 
 ## Endpoints
 
-| Verb | Path | Scope | Purpose |
-| --- | --- | --- | --- |
-| `GET` | `/api/v2/qso` | `qso:read` | List QSOs (paginated) |
-| `GET` | `/api/v2/qso/{id}` | `qso:read` | Fetch a single QSO |
-| `POST` | `/api/v2/qso` | `qso:write` | Create a QSO |
-| `PATCH` | `/api/v2/qso/{id}` | `qso:write` | Partial update |
-| `DELETE` | `/api/v2/qso/{id}` | `qso:delete` | Delete a QSO |
+| Verb | Path | Scope | Purpose | Since version |
+| --- | --- | --- | --- | --- |
+| `GET` | `/api/v2/qso` | `qso:read` | List QSOs (paginated) | <span class="wl-since">3.1.0</span> |
+| `GET` | `/api/v2/qso/{id}` | `qso:read` | Fetch a single QSO | <span class="wl-since">3.1.0</span> |
+| `POST` | `/api/v2/qso` | `qso:write` | Create a QSO | <span class="wl-since">3.1.0</span> |
+| `PATCH` | `/api/v2/qso/{id}` | `qso:write` | Partial update | <span class="wl-since">3.1.0</span> |
+| `DELETE` | `/api/v2/qso/{id}` | `qso:delete` | Delete a QSO | <span class="wl-since">3.1.0</span> |
 
 !!! note "There is no `PUT` on QSOs"
     Updates are always partial. Wavelog is the source of truth for your log, and

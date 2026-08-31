@@ -1,4 +1,4 @@
-# Clubstations
+# API v2 in Clubstations
 
 A [clubstation](../../admin-guide/administration/clubstations.md) lets several operators
 share one club or special callsign. API v2 supports that, but a token created
@@ -115,6 +115,20 @@ The refusal carries the codes and levels involved:
   }
 }
 ```
+
+### Logbooks are officer-only, reads included
+
+A [logbook](logbook.md) groups the club's station locations, so it is shared infrastructure
+too — but unlike station locations, even **reading** one takes level 9:
+
+| Request | Level 3 / 6 | Level 9 |
+| --- | --- | --- |
+| `GET /api/v2/logbook` | `403` | ✅ |
+| `GET /api/v2/logbook/{id}` | `403` | ✅ |
+| `POST` / `PATCH` / `DELETE` | `403` | ✅ |
+
+The web UI draws the same line — its whole logbook management screen is officer-only — so the
+`logbook:*` scopes are not even offered when a member below that level creates a token.
 
 ### Radios belong to their operator
 
@@ -233,6 +247,7 @@ Two things are *not* affected:
 | Choose the `operator` field | ✅ | overwritten | ✅ |
 | Read station locations | ✅ | ✅ | ✅ |
 | Write/delete station locations | ✅ | `403` | ✅ |
+| Logbooks (read and write) | ✅ | `403` | ✅ |
 | Own radios | ✅ | ✅ | ✅ |
 | Other operators' radios | — | `404` | ✅ |
 | Lookups across all operators | ✅ | own only | ✅ |

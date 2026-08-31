@@ -7,6 +7,7 @@ club permission page in the web UI.
 
 - **Base path:** `/api/v2/club`
 - **Scopes:** `club:read`, `club:write`, `club:delete`
+- **Since version:** <span class="wl-since">3.1.0</span>
 
 !!! note
     Read the [API v2 overview](index.md) first for authentication, the response
@@ -22,13 +23,13 @@ club permission page in the web UI.
 
 The path id addresses the **member**, using their `user_id`.
 
-| Verb | Path | Scope | Purpose |
-| --- | --- | --- | --- |
-| `GET` | `/api/v2/club` | `club:read` | List the clubstation's members — or, for an administrator who named no club, [the clubstations](#which-clubstations-are-there) |
-| `GET` | `/api/v2/club/{user_id}` | `club:read` | Fetch a single member |
-| `POST` | `/api/v2/club` | `club:write` | Add a member to the clubstation |
-| `PATCH` | `/api/v2/club/{user_id}` | `club:write` | Change a member's permission level |
-| `DELETE` | `/api/v2/club/{user_id}` | `club:delete` | Remove a member from the clubstation |
+| Verb | Path | Scope | Purpose | Since version |
+| --- | --- | --- | --- | --- |
+| `GET` | `/api/v2/club` | `club:read` | List the clubstation's members — or, for an administrator who named no club, [the clubstations](#which-clubstations-are-there) | <span class="wl-since">3.1.0</span> |
+| `GET` | `/api/v2/club/{user_id}` | `club:read` | Fetch a single member | <span class="wl-since">3.1.0</span> |
+| `POST` | `/api/v2/club` | `club:write` | Add a member to the clubstation | <span class="wl-since">3.1.0</span> |
+| `PATCH` | `/api/v2/club/{user_id}` | `club:write` | Change a member's permission level | <span class="wl-since">3.1.0</span> |
+| `DELETE` | `/api/v2/club/{user_id}` | `club:delete` | Remove a member from the clubstation | <span class="wl-since">3.1.0</span> |
 
 !!! note "There is no `PUT`"
     As on [Station](station.md) and [QSO](qso.md), the API has no full replace.

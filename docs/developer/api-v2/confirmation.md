@@ -7,6 +7,7 @@ here, exactly as it does in that table.
 
 - **Base path:** `/api/v2/confirmation`
 - **Scope:** `confirmation:read`
+- **Since version:** <span class="wl-since">3.1.0</span>
 
 !!! note
     Read the [API v2 overview](index.md) first for authentication, the response envelope and
@@ -26,9 +27,9 @@ It is easy to confuse with two other features, so it is worth being explicit:
 
 ## Endpoint
 
-| Verb | Path | Scope | Purpose |
-| --- | --- | --- | --- |
-| `GET` | `/api/v2/confirmation` | `confirmation:read` | List QSL confirmations, newest first |
+| Verb | Path | Scope | Purpose | Since version |
+| --- | --- | --- | --- | --- |
+| `GET` | `/api/v2/confirmation` | `confirmation:read` | List QSL confirmations, newest first | <span class="wl-since">3.1.0</span> |
 
 This is a **list-only** endpoint. There is no single-item URL — a request like
 `/api/v2/confirmation/42` returns `404 not_found`, because a confirmation has no stable id of its

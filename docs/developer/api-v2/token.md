@@ -6,6 +6,7 @@ endpoints and is handy for verifying a token and discovering which scopes it hol
 
 - **Base path:** `/api/v2/token`
 - **Scope:** none — any valid token may read its own metadata
+- **Since version:** <span class="wl-since">3.1.0</span>
 
 !!! note
     Read the [API v2 overview](index.md) first for authentication, the response
@@ -13,9 +14,9 @@ endpoints and is handy for verifying a token and discovering which scopes it hol
 
 ## Endpoint
 
-| Verb | Path | Scope | Purpose |
-| --- | --- | --- | --- |
-| `GET` | `/api/v2/token` | any valid token | Metadata of the current token |
+| Verb | Path | Scope | Purpose | Since version |
+| --- | --- | --- | --- | --- |
+| `GET` | `/api/v2/token` | any valid token | Metadata of the current token | <span class="wl-since">3.1.0</span> |
 
 The endpoint still requires a valid token (an invalid or expired one returns
 `401`), but it needs no particular scope.

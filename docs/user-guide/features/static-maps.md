@@ -40,6 +40,7 @@ Possible `GET` Options currently implemented:
 | `start_date` | shows qso's after this date. Set `YYYY-MM-DD` |  |
 | `end_date` | shows qso's before this date. Set `YYYY-MM-DD` |  |
 | `day` | valid values either `today` or `yesterday` |  |
+| `center` | set the map center to a specific location. Set a 4,6,8 or 10 char gridsquare (centers only longitude) | center of all station locations for the logbook |
 
 ### Example
 
