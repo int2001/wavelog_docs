@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wavelog Legacy API v1</title>
+<style>
+:root{
+  --bg:#fafafa;--panel:#fff;--border:#ddd;--border-lt:#eee;
+  --text:#3b4151;--head:#1b1b1b;--muted:#7c8290;--faint:#9095a2;
+  --green:#49cc90;--blue:#61affe;--exec:#4990e2;--red:#f93e3e;--amber:#fdb64c;--orange:#fca130;
+  --code-bg:#41444e;--box-bg:#fff;
+  --jk:#0550ae;--js:#116329;--jn:#953800;--jb:#8250df;--jl:#cf222e;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 "Open Sans",-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+button{font:inherit;cursor:pointer}
+input,select,textarea{font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#fff;color:#212121;border:1px solid var(--border);border-radius:2px;padding:6px 8px;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--exec);box-shadow:0 0 0 1px var(--exec)}
+input:disabled,select:disabled,textarea:disabled{background:#fbfbfd;color:#8c919e;cursor:not-allowed}
+label{display:block}
+a{color:var(--exec);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.topbar{background:var(--head);color:#fff;display:flex;align-items:center;gap:18px;padding:10px 20px;flex-wrap:wrap}
+.topbar .logo{font-size:18px;font-weight:700;white-space:nowrap}
+.topbar .vchip{font-size:11px;border:1px solid #888;color:#ccc;border-radius:3px;padding:1px 6px;margin-left:8px;font-weight:400}
+.topbar form.lab{display:flex;gap:0;flex:1;min-width:340px}
+.topbar .lab input{border-radius:2px 0 0 2px;border:none}
+.topbar .lab .explore{background:#fff;color:#212121;border:none;border-radius:0 2px 2px 0;padding:6px 18px;font-weight:700}
+.topbar .lab .explore:hover{background:#eee}
+.topbar .keybox{display:flex;gap:0;min-width:280px}
+.topbar .keybox input{border-radius:2px 0 0 2px;border:none}
+.topbar .keybox button{background:#333;color:#ccc;border:none;border-radius:0 2px 2px 0;padding:6px 12px;font-size:12px}
+.topbar .keybox button:hover{color:#fff}
+
+.wrap{max-width:1200px;margin:0 auto;padding:20px 20px 60px}
+.info{border-bottom:1px solid var(--border);padding:10px 0 20px;margin-bottom:10px}
+.info h1{font-size:28px;margin:0 0 4px;display:flex;align-items:center;gap:10px}
+.info .ver{font-size:12px;color:var(--muted);border:1px solid var(--border);border-radius:3px;padding:2px 8px}
+.info p{margin:8px 0 0;max-width:100ch;color:var(--text)}
+.info .ext{margin-top:6px;font-size:13px}
+.info .warn{margin-top:12px;padding:8px 12px;background:rgba(253,182,76,.1);border-left:4px solid var(--amber);font-size:13px;border-radius:0 3px 3px 0}
+
+h2.tag{font-size:22px;border-bottom:1px solid var(--border);padding:24px 0 8px;margin:10px 0 14px;font-weight:400}
+
+.op{border:1px solid var(--border);border-radius:3px;background:var(--panel);margin-bottom:8px}
+.ophead{display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;user-select:none}
+.ophead:hover{background:#fbfbfd}
+.op.open .ophead{border-bottom:1px solid var(--border-lt)}
+.mbadge{font:700 13px/1 Arial,sans-serif;color:#fff;border-radius:3px;padding:5px 0;width:64px;text-align:center;flex-shrink:0}
+.mbadge.post{background:var(--green)}
+.mbadge.get{background:var(--blue)}
+.oppath{font:600 15px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#212121;word-break:break-all}
+.opsum{color:var(--muted);font-size:13px;margin-left:8px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.opchips{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+.chip{font-size:10px;text-transform:uppercase;letter-spacing:.04em;border:1px solid var(--border);color:var(--muted);border-radius:3px;padding:2px 6px;white-space:nowrap}
+.chip.url{border-color:#a179dc;color:#a179dc}
+.chip.rw{border-color:var(--red);color:var(--red)}
+.chip.src{border-color:var(--orange);color:var(--orange)}
+.chev{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:7px solid var(--muted);transition:transform .15s;flex-shrink:0}
+.op.open .chev{transform:rotate(180deg)}
+.opbody{display:none;padding:14px 20px 20px}
+.op.open .opbody{display:block}
+.opdesc{margin:0 0 4px;max-width:100ch}
+.hint{margin:14px 0;padding:8px 12px;background:rgba(253,182,76,.1);border-left:4px solid var(--amber);border-radius:0 3px 3px 0;font-size:13px}
+.hint b{color:#b26a00}
+.hint ul{margin:6px 0 0;padding-left:18px}
+.hint li{margin:3px 0}
+.hint code{background:#f5f0e6;border-radius:2px;padding:0 4px;font-size:12px}
+
+h3.sec{font-size:16px;font-weight:600;margin:20px 0 6px;display:flex;align-items:center;gap:8px}
+h3.sec::after{content:"";flex:1;border-bottom:1px solid var(--border-lt)}
+
+.param-row{display:grid;grid-template-columns:180px 1fr 320px;gap:14px;padding:10px 0;border-bottom:1px solid var(--border-lt);align-items:start}
+.param-row.wide{grid-template-columns:180px 1fr}
+.param-row.wide .p-val{grid-column:2}
+.p-name b{font-size:14px;color:#212121;font-family:ui-monospace,Menlo,monospace}
+.p-type{font-size:12px;color:var(--muted);margin-top:2px}
+.p-type .req{color:var(--red);font-weight:700}
+.p-desc{font-size:13px;color:var(--text);padding-top:2px}
+.checks{display:flex;gap:14px;flex-wrap:wrap;padding-top:4px}
+.checks label{display:flex;gap:6px;align-items:center;font:12px ui-monospace,Menlo,monospace;margin:0}
+.checks input{width:auto;margin:0}
+.checks input[type=checkbox].cb,input[type=checkbox].cb{width:auto;margin:0}
+.cbrow{display:flex;align-items:center;gap:8px}
+.cbrow .cblabel{font:13px ui-monospace,Menlo,monospace}
+
+.btnrow{display:flex;gap:10px;align-items:center;margin-top:16px;flex-wrap:wrap}
+.btn{border-radius:2px;padding:7px 18px;font-weight:700;font-size:14px;background:transparent}
+.btn.try{border:2px solid #212121;color:#212121}
+.btn.try:hover{background:rgba(0,0,0,.06)}
+.btn.exec{background:#212121;color:#fff;border:2px solid #212121}
+.btn.exec:hover{background:#333;border-color:#333}
+.btn.clear{border:2px solid #999;color:#999}
+.btn.clear:hover{border-color:#212121;color:#212121}
+.btn.cancel{border:2px solid var(--red);color:var(--red)}
+.btn.cancel:hover{background:rgba(249,62,62,.08)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.exec-msg{font-size:13px;color:var(--red)}
+
+.codebox{margin-top:18px;border:1px solid var(--border);border-radius:3px;overflow:hidden;background:var(--box-bg)}
+.codebox .boxhead{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;background:#f7f7f9}
+.codebox.dark{background:var(--code-bg)}
+.codebox.dark .boxhead{background:#383b44;border-bottom:1px solid #383b44;color:#fff}
+pre{margin:0;padding:12px 14px;overflow:auto;font:12.5px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-all}
+.codebox.dark pre{color:#f0f0f0}
+.copybtn{margin-left:auto;background:transparent;border:1px solid #bbb;color:inherit;border-radius:2px;padding:2px 10px;font-size:11px;font-weight:400}
+.codebox.dark .copybtn{border-color:#777;color:#ccc}
+.copybtn:hover{border-color:#000}
+.respmeta{display:flex;gap:14px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--border-lt);font:12px ui-monospace,Menlo,monospace;color:var(--muted);flex-wrap:wrap}
+.status{font-weight:700;padding:2px 10px;border-radius:3px;border:2px solid}
+.status.s2{color:#fff;background:var(--exec);border-color:var(--exec)}
+.status.s3{color:#fff;background:#33a; border-color:#33a}
+.status.s4,.status.s5{color:#fff;background:var(--red);border-color:var(--red)}
+.status.s0{color:#fff;background:#9095a2;border-color:#9095a2}
+details.respheaders{padding:4px 12px;border-bottom:1px solid var(--border-lt)}
+details.respheaders summary{cursor:pointer;font-size:12px;color:var(--muted);user-select:none}
+details.respheaders table{margin:6px 0;font:11.5px ui-monospace,Menlo,monospace;border-collapse:collapse}
+details.respheaders td{padding:2px 10px 2px 0;color:var(--muted)}
+details.respheaders td:first-child{color:var(--jk)}
+
+.resp-docs{margin-top:8px}
+.resp-docs .rc{display:flex;gap:14px;padding:6px 0;border-bottom:1px solid var(--border-lt);font-size:13px}
+.resp-docs .code{font:700 12px/1.6 ui-monospace,Menlo,monospace;padding:1px 8px;border-radius:3px;color:var(--exec);border:2px solid var(--exec);height:fit-content}
+.resp-docs .code.r4,.resp-docs .code.r5{color:var(--red);border-color:var(--red)}
+.resp-docs .code.r2{color:var(--exec);border-color:var(--exec)}
+
+.jk{color:var(--jk)}.js{color:var(--js)}.jn{color:var(--jn)}.jb{color:var(--jb)}.jl{color:var(--jl)}
+
+footer{margin-top:40px;color:var(--faint);font-size:12px;border-top:1px solid var(--border);padding-top:12px}
+@media(max-width:820px){
+  .param-row{grid-template-columns:1fr}
+  .param-row.wide{grid-template-columns:1fr}
+  .param-row.wide .p-val{grid-column:1}
+  .opsum{display:none}
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo">Wavelog Legacy API<span class="vchip">v1</span></div>
+  <form class="lab" onsubmit="return false">
+    <input id="base-url" placeholder="https://log.example.com (base URL)" spellcheck="false" autocomplete="off">
+    <button class="explore" type="submit" id="explore-btn">Explore</button>
+  </form>
+  <div class="keybox">
+    <input id="api-key" type="password" placeholder="API key (wl...)" spellcheck="false" autocomplete="off">
+    <button type="button" id="key-toggle">show</button>
+  </div>
+</div>
+<div class="wrap">
+  <div class="info">
+    <h1>Wavelog Legacy API <span class="ver">v1</span></h1>
+    <p>Original Wavelog API for third-party tools: QSO import, ADIF export, radio CAT status, logbook checks, lookups and station management. All requests go to <code>{base}/index.php/api/...</code>. Depending on the endpoint the API key is transported inside the JSON body or as URL segment. Content of requests is JSON (<code>Content-Type: application/json</code>).</p>
+    <div class="warn"><b>Note:</b> instance owners may rate-limit endpoints (radio, qso, get_contacts_adif, lookups). Use politely: post radio data only on change, use exports as delta-loads. Read+write endpoints are marked with a red <span class="chip rw">rw key</span> chip.</div>
+    <p class="ext">External docs: <a href="https://docs.wavelog.org/developer/api/" target="_blank" rel="noopener">docs.wavelog.org/developer/api</a></p>
+  </div>
+  <div id="groups"></div>
+  <footer>Wavelog Legacy API v1 tester. Endpoint catalog cross-checked against <code>application/controllers/Api.php</code> (src chips = undocumented endpoints found in source). API key never leaves the browser except in requests to the configured base URL.</footer>
+</div>
+<script>
+"use strict";
+
+const ADIF_EXAMPLE = "<call:5>N9EAT<band:4>70cm<mode:3>SSB<freq:10>432.166976<qso_date:8>20190616<time_on:6>170600<time_off:6>170600<rst_rcvd:2>59<rst_sent:2>55<qsl_rcvd:1>N<qsl_sent:1>N<country:24>United States Of America<gridsquare:4>EN42<sat_mode:3>U/V<sat_name:4>AO-7<prop_mode:3>SAT<name:5>Marty<eor>";
+
+const CREATE_STATION_EXAMPLE = JSON.stringify([
+  {
+    station_profile_name: "DJ7NT at Home",
+    hrdlog_username: "DJ7NT",
+    station_gridsquare: "JO30",
+    station_city: "Unkel",
+    station_iota: "",
+    station_sota: "",
+    station_callsign: "DJ7NT",
+    station_power: "100",
+    station_dxcc: "230",
+    dxccname: "FEDERAL REPUBLIC OF GERMANY",
+    dxccprefix: "DL",
+    station_cnty: "",
+    station_cq: "14",
+    station_itu: "28",
+    station_active: "1",
+    eqslqthnickname: "at Home",
+    state: "RP",
+    county: null,
+    station_sig: "",
+    station_sig_info: "",
+    qrzrealtime: "-1",
+    station_wwff: "",
+    station_pota: "",
+    oqrs: "1",
+    oqrs_text: "",
+    oqrs_email: "0",
+    webadifrealtime: "0",
+    clublogrealtime: "0",
+    clublogignore: "0",
+    hrdlogrealtime: "0",
+    eqsl_default_qslmsg: "Testing --> Good signal & nice QSO",
+    link_active_logbook: "1"
+  }
+], null, 2);
+
+const ENDPOINTS = [
+  {
+    id: "qso", group: "QSO Logging", name: "qso", method: "POST", path: "api/qso", auth: "body", rights: "rw",
+    summary: "Import ADIF QSOs",
+    desc: "Send ADIF QSO strings via JSON to be imported. Multiple QSOs per call allowed (one per <eor>). Dupe checking is handled on the fly.",
+    hint: `<ul>
+      <li><b>Read+write key required</b> — read-only keys get HTTP 403.</li>
+      <li>No live QRZ upload and no callbook lookup of the partner for API-posted QSOs (performance by design).</li>
+      <li>Rate-limited on many instances: batch QSOs instead of one call per QSO.</li>
+      <li>Response echoes the payload with <code>string</code> emptied.</li>
+    </ul>`,
+    params: [
+      { name: "station_profile_id", type: "text", req: true, ph: "1", help: "Station Profile ID. Find it via station_info or in the URL when editing a station profile." },
+      { name: "type", type: "select", req: true, options: [{ v: "adif", l: "adif" }], value: "adif", help: 'Must be "adif".' },
+      { name: "string", type: "textarea", req: true, wide: true, ph: ADIF_EXAMPLE, help: "Raw ADIF record(s), terminated by <eor>." },
+    ],
+    responses: [
+      { code: "201", d: "QSOs imported — {status: created, adif_count, adif_errors, messages}." },
+      { code: "400", d: "Import aborted (missing key/type/station or ADIF errors)." },
+      { code: "401", d: "Invalid key." },
+      { code: "403", d: "Key is read-only, or station_profile_id belongs to someone else." },
+      { code: "429", d: "Rate limit hit (if configured) — see Retry-After header." },
+    ],
+  },
+  {
+    id: "qso-dryrun", group: "QSO Logging", name: "qso/dryrun", method: "POST", path: "api/qso/dryrun", auth: "body", rights: "rw",
+    summary: "Validate ADIF without importing",
+    desc: "Same payload as api/qso, but validation only. Nothing is imported; response contains messages only.",
+    hint: `<ul><li>Useful to test key, station_profile_id and ADIF syntax before a real import.</li></ul>`,
+    params: [
+      { name: "station_profile_id", type: "text", req: true, ph: "1", help: "Station Profile ID of the key owner." },
+      { name: "type", type: "select", req: true, options: [{ v: "adif", l: "adif" }], value: "adif", help: 'Must be "adif".' },
+      { name: "string", type: "textarea", req: true, wide: true, ph: ADIF_EXAMPLE, help: "Raw ADIF record(s)." },
+    ],
+    responses: [
+      { code: "201", d: "Dryrun accepted — messages: ['Dryrun works']." },
+      { code: "400", d: "Validation errors — see messages." },
+      { code: "401", d: "Invalid key." },
+    ],
+  },
+  {
+    id: "get_contacts_adif", group: "Export", name: "get_contacts_adif", method: "POST", path: "api/get_contacts_adif", auth: "body",
+    summary: "Export QSOs as ADIF/JSON delta",
+    desc: "Stream QSOs as JSON-embedded ADIF (or selected ADIF fields as JSON) for delta-loads into 3rd-party software.",
+    hint: `<ul>
+      <li><b>Designed for delta-loads:</b> do not crawl the whole log every minute. Feed <code>lastfetchedid</code> from the response into <code>fetchfromid</code> on the next call.</li>
+      <li>Rate-limited on many instances.</li>
+      <li><code>fields</code> only takes effect with <code>output_format=json</code>; result rows are unique on the selected fields.</li>
+      <li><code>qsl_filter</code> = received confirmations, behaves as OR. WL &gt; 2.4.</li>
+      <li><code>station_id</code> accepts an array since WL &gt; 2.5.1 (comma-separate here).</li>
+      <li>Default <code>limit</code> is 20000 QSOs per call.</li>
+    </ul>`,
+    params: [
+      { name: "station_id", type: "array", req: true, ph: "1 or 1,2", help: "Station ID(s). Array supported WL > 2.5.1." },
+      { name: "fetchfromid", type: "number", req: true, value: "0", help: "Internal PK of last pulled QSO. 0 = all." },
+      { name: "limit", type: "number", ph: "20000", help: "Max QSOs per call. Default 20000." },
+      { name: "output_format", type: "select", options: [{ v: "", l: "(adif, default)" }, { v: "adif", l: "adif" }, { v: "json", l: "json" }], help: "json returns the fields array as JSON." },
+      { name: "fields", type: "array", ph: "CALL,DXCC,QSO_DATE", help: "ADIF field names. Only with output_format=json." },
+      { name: "qsl_filter", type: "checks", options: ["lotw", "qsl", "eqsl", "clublog"], help: "OR-filter on received confirmations." },
+      { name: "band", type: "text", ph: "20m / SAT", help: "Single band filter." },
+    ],
+    responses: [
+      { code: "200", d: "Export successful — {exported_qsos, lastfetchedid, message, adif} or JSON records. Empty delta also returns 200." },
+      { code: "400", d: "Missing/invalid parameters (e.g. unknown band)." },
+      { code: "401", d: "Invalid key." },
+      { code: "429", d: "Rate limit hit (if configured)." },
+    ],
+  },
+  {
+    id: "radio", group: "Radio", name: "radio", method: "POST", path: "api/radio", auth: "body", rights: "rw",
+    summary: "Push radio/CAT status",
+    desc: "Push CAT data (frequency, mode, power) to Wavelog. Standard, extended (RX/satellite) and custom callback URL variants share this endpoint.",
+    hint: `<ul>
+      <li><b>Send only changes:</b> post when frequency or mode actually changes, not blind every second — the instance owner may have set a rate-limit and your requests will fail with HTTP 429.</li>
+      <li><b>Read+write key required.</b></li>
+      <li><code>cat_url</code> (WL &gt; 2.1.1) changes the callback URL for that radio name and can disrupt other tools like WavelogGate.</li>
+      <li>Must pass <code>radio</code> plus at least one numeric frequency field; frequencies in Hz.</li>
+      <li>Satellite trackers use uplink_/downlink_ fields instead of frequency/frequency_rx.</li>
+    </ul>`,
+    params: [
+      { name: "radio", type: "text", req: true, ph: "FT-950", help: "Arbitrary name identifying the device." },
+      { name: "frequency", type: "number", ph: "14075000", help: "Frequency in Hz." },
+      { name: "mode", type: "text", ph: "SSB" },
+      { name: "power", type: "number", ph: "100", help: "TX power in watts." },
+      { name: "timestamp", type: "text", ph: "2012/04/07 16:47" },
+      { name: "frequency_rx", type: "number", ph: "10489670000", help: "RX frequency in Hz." },
+      { name: "mode_rx", type: "text", ph: "SSB", help: "RX mode (not logged)." },
+      { name: "prop_mode", type: "text", ph: "SAT", help: "Max 10 chars." },
+      { name: "sat_name", type: "text", ph: "QO-100" },
+      { name: "cat_url", type: "text", ph: "https://log.example.com:54321", help: "Custom callback URL. WL > 2.1.1." },
+      { name: "uplink_freq", type: "number", ph: "2400210000", help: "Satellite uplink Hz." },
+      { name: "uplink_mode", type: "text", ph: "SSB" },
+      { name: "downlink_freq", type: "number", ph: "10489710000", help: "Satellite downlink Hz." },
+      { name: "downlink_mode", type: "text", ph: "SSB" },
+    ],
+    responses: [
+      { code: "200", d: "{status: success} — CAT data stored/forwarded." },
+      { code: "400", d: "Invalid or missing fields (no radio name, no frequency)." },
+      { code: "401", d: "Invalid key." },
+      { code: "403", d: "Key is read-only." },
+      { code: "429", d: "Rate limit hit (if configured)." },
+    ],
+  },
+  {
+    id: "logbook_check_callsign", group: "Logbook", name: "logbook_check_callsign", method: "POST", path: "api/logbook_check_callsign", auth: "body",
+    summary: "Check callsign in public logbook",
+    desc: "Check if a callsign is in a public logbook.",
+    hint: `<ul>
+      <li>Success returns HTTP <b>201</b> with <code>{callsign, result: "Found"|"Not Found"}</code>.</li>
+      <li>Bad slug returns 404. Missing fields return 401 (server quirk, not 400).</li>
+      <li>Set band to <code>SAT</code> to search satellite QSOs only.</li>
+    </ul>`,
+    params: [
+      { name: "logbook_public_slug", type: "text", req: true, ph: "logbook slug", help: "Station Logbook Public Slug." },
+      { name: "callsign", type: "text", req: true, ph: "VK4XY" },
+      { name: "band", type: "text", ph: "2m / SAT", help: "Optional. SAT = satellite only." },
+    ],
+    responses: [
+      { code: "201", d: "{callsign, result: Found|Not Found}." },
+      { code: "401", d: "Invalid key — also returned for missing mandatory fields (quirk)." },
+      { code: "404", d: "Unknown logbook_public_slug." },
+    ],
+  },
+  {
+    id: "logbook_check_grid", group: "Logbook", name: "logbook_check_grid", method: "POST", path: "api/logbook_check_grid", auth: "body",
+    summary: "Check grid in public logbook",
+    desc: "Check if a grid square is in a public logbook.",
+    hint: `<ul>
+      <li>Result values: <code>Not Found</code>, <code>Found</code>, <code>Worked</code>, <code>Confirmed</code> (with <code>cnfm</code>). Response grid is uppercased.</li>
+      <li>Success returns HTTP 201.</li>
+    </ul>`,
+    params: [
+      { name: "logbook_public_slug", type: "text", req: true, ph: "logbook slug" },
+      { name: "grid", type: "text", req: true, ph: "JO30" },
+      { name: "band", type: "text", ph: "2m / SAT" },
+      { name: "cnfm", type: "checkbox", help: "Check confirmations." },
+    ],
+    responses: [
+      { code: "201", d: "{gridsquare, result: Not Found|Found|Worked|Confirmed}." },
+      { code: "401", d: "Invalid key." },
+      { code: "404", d: "Unknown logbook_public_slug." },
+    ],
+  },
+  {
+    id: "logbook_get_worked_grids", group: "Logbook", name: "logbook_get_worked_grids", method: "POST", path: "api/logbook_get_worked_grids", auth: "body", undoc: true,
+    summary: "List worked grids of own logbook",
+    desc: "List worked 4-character grid squares of one of your own logbooks. Returns a raw JSON array.",
+    hint: `<ul>
+      <li><code>logbook_id</code> must belong to the API key owner.</li>
+      <li><code>band</code> empty or <code>All</code> = any band; <code>SAT</code> special-cased.</li>
+      <li>Rate-limited on many instances. Success returns HTTP 201.</li>
+    </ul>`,
+    params: [
+      { name: "logbook_id", type: "text", req: true, ph: "1", help: "Internal logbook ID of the key owner." },
+      { name: "band", type: "text", ph: "All / 2m / SAT" },
+      { name: "cnfm", type: "select", options: [{ v: "", l: "(none)" }, { v: "qsl", l: "qsl" }, { v: "lotw", l: "lotw" }, { v: "eqsl", l: "eqsl" }], help: "Only confirmed via method." },
+    ],
+    responses: [
+      { code: "201", d: "Raw JSON array of 4-char grids." },
+      { code: "401", d: "Invalid key." },
+      { code: "404", d: "logbook_id not found or not owned by key user." },
+      { code: "429", d: "Rate limit hit (if configured)." },
+    ],
+  },
+  {
+    id: "private_lookup", group: "Lookup", name: "private_lookup", method: "POST", path: "api/private_lookup", auth: "body",
+    summary: "Check own logbook for confirmations",
+    desc: "Checks the API owner's logbook for confirmations of a callsign (DXCC/band/mode status). WL >= 1.8.6.",
+    hint: `<ul>
+      <li><code>band</code>/<code>mode</code> optional — omitting them disables the corresponding *_band / *_band_mode result flags.</li>
+      <li><code>callbook: true</code> also returns callbook info (WL &gt; 2.2.3).</li>
+      <li><code>station_ids</code> must be an array; ungranted IDs fall back to all owner stations.</li>
+      <li>Rate-limited on many instances.</li>
+    </ul>`,
+    params: [
+      { name: "callsign", type: "text", req: true, ph: "VK4XY" },
+      { name: "band", type: "text", ph: "20m" },
+      { name: "mode", type: "text", ph: "SSB" },
+      { name: "station_ids", type: "array", ph: "1,2", help: "Restrict to these station profiles." },
+      { name: "callbook", type: "checkbox", help: "Include callbook data (WL > 2.2.3)." },
+    ],
+    responses: [
+      { code: "200", d: "Lookup result (dxcc, call_worked*, dxcc_confirmed*, call_confirmed*, ...)." },
+      { code: "401", d: "Invalid key." },
+      { code: "429", d: "Rate limit hit (if configured)." },
+    ],
+  },
+  {
+    id: "lookup", group: "Lookup", name: "lookup", method: "POST", path: "api/lookup", auth: "body", undoc: true,
+    summary: "Worked-before check (DX cluster)",
+    desc: "Lightweight worked-before check used by the DX cluster integration. Callsign data only, no band/mode confirmation logic.",
+    hint: `<ul><li>Undocumented: present in source (Api.php), not on docs site.</li><li>Rate-limited on many instances.</li></ul>`,
+    params: [
+      { name: "callsign", type: "text", req: true, ph: "VK4XY" },
+    ],
+    responses: [
+      { code: "200", d: "Callsign lookup result with workedBefore flag." },
+      { code: "401", d: "Invalid key." },
+      { code: "429", d: "Rate limit hit (if configured)." },
+    ],
+  },
+  {
+    id: "create_station", group: "Station Management", name: "create_station", method: "POST", path: "api/create_station", auth: "url", rights: "rw",
+    summary: "Create station locations",
+    desc: "Create station_location(s) from a JSON array of objects. Dupe handling built in. WL > 2.1.2.",
+    hint: `<ul>
+      <li>Detects dupes by exact same references/call or same <code>station_uuid</code> — then returns 200 <code>{"status":"dupe"}</code>.</li>
+      <li>201 = created, 400 = invalid JSON, 401 = wrong key, 403 = club-station permission denied (perm 3/6), 500 = other error.</li>
+      <li><code>link_active_logbook</code> (WL &gt; 2.3.1): any truthy value links the new location to the owner's active logbook.</li>
+      <li><code>qrzapikey</code> supported from WL &gt; 2.5.1.</li>
+    </ul>`,
+    bodyMode: "raw",
+    rawExample: CREATE_STATION_EXAMPLE,
+    params: [],
+    responses: [
+      { code: "201", d: "Locations imported." },
+      { code: "200", d: "Dupe detected — 0 locations imported." },
+      { code: "400", d: "Invalid JSON file." },
+      { code: "401", d: "Auth error, invalid key." },
+      { code: "403", d: "Club-station user without permission." },
+      { code: "500", d: "Other server-side error." },
+    ],
+  },
+  {
+    id: "station_info", group: "Station Management", name: "station_info", method: "GET", path: "api/station_info", auth: "url",
+    summary: "List station locations",
+    desc: "Returns information about station locations (logbook locations) belonging to the API key owner.",
+    hint: `<ul>
+      <li>Key goes in the URL: <code>/index.php/api/station_info/&lt;key&gt;</code>.</li>
+      <li>Use <code>station_id</code> from this response for get_contacts_adif / get_wp_stats, and the profile ID for api/qso.</li>
+    </ul>`,
+    params: [],
+    responses: [
+      { code: "200", d: "JSON array of station objects (station_id, station_profile_name, station_callsign, station_gridsquare, ...)." },
+      { code: "401", d: "Invalid key." },
+    ],
+  },
+  {
+    id: "auth", group: "Info & Auth", name: "auth", method: "GET", path: "api/auth", auth: "url",
+    summary: "Validate key (XML)",
+    desc: "Validate an API key. Returns XML (not JSON).",
+    hint: `<ul><li>Response is <code>text/xml</code>: <code>&lt;auth&gt;&lt;status&gt;Valid&lt;/status&gt;&lt;rights&gt;rw&lt;/rights&gt;&lt;/auth&gt;</code>.</li><li>Key in URL segment 3.</li></ul>`,
+    params: [],
+    responses: [
+      { code: "200", d: "XML: <auth><status>Valid</status><rights>r|rw</rights></auth>, or <message> for an invalid key." },
+    ],
+  },
+  {
+    id: "check_auth", group: "Info & Auth", name: "check_auth", method: "GET", path: "api/check_auth", auth: "url", undoc: true,
+    summary: "Validate key (JSON)",
+    desc: "Validate an API key, JSON variant.",
+    hint: `<ul><li>Undocumented: present in source (Api.php), not on docs site.</li></ul>`,
+    params: [],
+    responses: [
+      { code: "200", d: "{status: valid, rights: r|rw}." },
+      { code: "401", d: "{status: failed}." },
+    ],
+  },
+  {
+    id: "statistics", group: "Info & Auth", name: "statistics", method: "GET", path: "api/statistics", auth: "url",
+    summary: "Dashboard QSO statistics",
+    desc: "Returns the active profile stats of the key owner: today / month / year / total QSOs.",
+    hint: `<ul>
+      <li>Key in URL: <code>/index.php/api/statistics/&lt;key&gt;</code>.</li>
+      <li><b>Quirk:</b> an invalid key returns zeros with HTTP 201 (down-compat) — do not rely on status alone.</li>
+    </ul>`,
+    params: [],
+    responses: [
+      { code: "201", d: "{Today, total_qsos, month_qsos, year_qsos} — zeros on invalid key (quirk)." },
+    ],
+  },
+  {
+    id: "version", group: "Info & Auth", name: "version", method: "POST", path: "api/version", auth: "body",
+    summary: "Server version",
+    desc: "Reports the running Wavelog version. WL >= 2.0.",
+    hint: `<ul><li>Returns <code>{"status":"ok","version":"..."}</code>.</li></ul>`,
+    params: [],
+    responses: [
+      { code: "200", d: "{status: ok, version: ...}." },
+      { code: "401", d: "Invalid key." },
+    ],
+  },
+  {
+    id: "get_wp_stats", group: "Info & Auth", name: "get_wp_stats", method: "POST", path: "api/get_wp_stats", auth: "body",
+    summary: "QSO counts per mode/year",
+    desc: "QSO counts (total, current year, per mode) for one station. Built for the WordPress QSO-display plugin. WL >= 2.0.1.",
+    hint: `<ul>
+      <li><code>station_id</code> must belong to the key owner.</li>
+      <li>Result cached 10 minutes server-side — repeated calls may be stale.</li>
+    </ul>`,
+    params: [
+      { name: "station_id", type: "text", req: true, ph: "1", help: "Station ID of the key owner." },
+    ],
+    responses: [
+      { code: "200", d: "{status: successful, statistics: {totalalltime, totalthisyear, totalgroupedmodes}}." },
+      { code: "401", d: "Invalid key." },
+      { code: "404", d: "station_id not found / not owned." },
+    ],
+  },
+  {
+    id: "list_clubmembers", group: "Info & Auth", name: "list_clubmembers", method: "POST", path: "api/list_clubmembers", auth: "body",
+    summary: "List clubstation members",
+    desc: "Returns members of the clubstation associated with the API key. WL > 2.3.1.",
+    hint: `<ul>
+      <li><b>Key of a "Club Officer" user (permission 9) required.</b></li>
+      <li>204 = clubstation has no members.</li>
+    </ul>`,
+    params: [],
+    responses: [
+      { code: "200", d: "{status: successful, members: [{callsign, user_name, p_level}]}." },
+      { code: "204", d: "Clubstation has no members." },
+      { code: "401", d: "Invalid key." },
+      { code: "403", d: "Key does not belong to a Club Officer." },
+    ],
+  },
+];
+
+const GROUP_ORDER = ["QSO Logging", "Export", "Radio", "Logbook", "Lookup", "Station Management", "Info & Auth"];
+
+const state = {
+  base: localStorage.getItem("wlat_base") || "",
+  key: localStorage.getItem("wlat_key") || "",
+  open: new Set(),
+  trying: new Set(),
+  forms: {},
+};
+
+const $ = (sel, root) => (root || document).querySelector(sel);
+const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
+const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+const TYPE_LABEL = { text: "string", number: "number", textarea: "string", array: "array[string]", select: "enum", checkbox: "boolean", checks: "array[enum]" };
+
+function normalizeBase(b) {
+  let v = (b || "").trim().replace(/\/+$/, "");
+  if (!v) return "";
+  if (!/^https?:\/\//i.test(v)) v = "https://" + v;
+  if (!/\/index\.php$/i.test(v)) v += "/index.php";
+  return v;
+}
+
+function endpointUrl(ep) {
+  const base = normalizeBase(state.base);
+  let url = base + "/" + ep.path;
+  if (ep.auth === "url") url += "/" + encodeURIComponent(state.key.trim());
+  return url;
+}
+
+function defaultParamValue(p) {
+  if (p.value !== undefined) return p.value;
+  if (p.type === "checkbox") return false;
+  if (p.type === "checks") return [];
+  if (p.type === "select") return (p.options[0] || {}).v || "";
+  return "";
+}
+
+function loadFormState(ep) {
+  if (!state.forms[ep.id]) {
+    const vals = {};
+    ep.params.forEach((p) => { vals[p.name] = defaultParamValue(p); });
+    if (ep.bodyMode === "raw") vals.__raw = ep.rawExample || "";
+    state.forms[ep.id] = vals;
+  }
+  return state.forms[ep.id];
+}
+
+function collectBody(ep) {
+  const vals = loadFormState(ep);
+  if (ep.bodyMode === "raw") {
+    let parsed;
+    try { parsed = JSON.parse(vals.__raw); }
+    catch (e) { return { error: "Invalid JSON in request body: " + e.message }; }
+    return { body: parsed };
+  }
+  const out = { key: state.key.trim() };
+  for (const p of ep.params) {
+    let v = vals[p.name];
+    if (p.type === "checkbox") { if (v) out[p.name] = true; continue; }
+    if (p.type === "checks") { if (v && v.length) out[p.name] = v; continue; }
+    if (v === "" || v === undefined || v === null) continue;
+    if (p.type === "array") {
+      const arr = String(v).split(",").map((s) => s.trim()).filter(Boolean).map((s) => (/^-?\d+$/.test(s) ? Number(s) : s));
+      if (arr.length) out[p.name] = arr.length === 1 ? arr[0] : arr;
+      continue;
+    }
+    if (p.type === "number") {
+      const n = Number(v);
+      if (!Number.isNaN(n)) out[p.name] = n;
+      continue;
+    }
+    out[p.name] = v;
+  }
+  return { body: out };
+}
+
+function curlFor(ep) {
+  const url = endpointUrl(ep);
+  if (!url) return "";
+  if (ep.method === "GET") return "curl -i '" + url + "'";
+  const r = collectBody(ep);
+  if (r.error) return "";
+  const json = JSON.stringify(r.body, null, 2);
+  return "curl -i -X " + ep.method + " '" + url + "' \\\n  -H 'Content-Type: application/json' \\\n  -H 'Accept: application/json' \\\n  -d '" + json.replace(/'/g, "'\\''") + "'";
+}
+
+function paramRowHtml(ep, p) {
+  const vals = loadFormState(ep);
+  const v = vals[p.name];
+  const tlabel = TYPE_LABEL[p.type] || "string";
+  const typeHtml = '<div class="p-type">' + esc(tlabel) + (p.req ? ' <span class="req">*</span>' : "") + "</div>";
+  const nameHtml = '<div class="p-name"><b>' + esc(p.name) + "</b>" + typeHtml + "</div>";
+  const descHtml = '<div class="p-desc">' + esc(p.help || "") + "</div>";
+  let ctl;
+  if (p.type === "textarea") {
+    ctl = '<textarea data-p="' + esc(p.name) + '" rows="6" placeholder="' + esc(p.ph || "") + '">' + esc(v) + "</textarea>";
+  } else if (p.type === "select") {
+    ctl = '<select data-p="' + esc(p.name) + '">' + p.options.map((o) => '<option value="' + esc(o.v) + '"' + (v === o.v ? " selected" : "") + ">" + esc(o.l) + "</option>").join("") + "</select>";
+  } else if (p.type === "checkbox") {
+    ctl = '<div class="cbrow"><input type="checkbox" class="cb" data-p="' + esc(p.name) + '"' + (v ? " checked" : "") + '><span class="cblabel">' + (v ? "true" : "false") + "</span></div>";
+  } else if (p.type === "checks") {
+    ctl = '<div class="checks">' + p.options.map((o) => '<label><input type="checkbox" class="cb" data-checks="' + esc(p.name) + '" value="' + esc(o) + '"' + (v.includes(o) ? " checked" : "") + "> " + esc(o) + "</label>").join("") + "</div>";
+  } else {
+    ctl = '<input data-p="' + esc(p.name) + '" placeholder="' + esc(p.ph || "") + '" value="' + esc(v) + '" spellcheck="false">';
+  }
+  return '<div class="param-row' + (p.wide ? " wide" : "") + '">' + nameHtml + descHtml + '<div class="p-val">' + ctl + "</div></div>";
+}
+
+function respDocsHtml(ep) {
+  return '<div class="resp-docs">' + ep.responses.map((r) => {
+    const cls = r.code[0] === "4" || r.code[0] === "5" ? "r" + r.code[0] : "r2";
+    return '<div class="rc"><span class="code ' + cls + '">' + esc(r.code) + "</span><span>" + r.d + "</span></div>";
+  }).join("") + "</div>";
+}
+
+function opHtml(ep) {
+  const chips = '<span class="chip' + (ep.auth === "url" ? " url" : "") + '">' + (ep.auth === "url" ? "key in URL" : "key in body") + "</span>" +
+    (ep.rights === "rw" ? '<span class="chip rw">rw key</span>' : "") +
+    (ep.undoc ? '<span class="chip src">src</span>' : "");
+
+  let body = "";
+  if (ep.desc) body += '<p class="opdesc">' + ep.desc + "</p>";
+  if (ep.hint) body += '<div class="hint"><b>Hints</b>' + ep.hint + "</div>";
+
+  if (ep.bodyMode === "raw") {
+    body += '<h3 class="sec">Request body</h3>' +
+      '<div class="param-row wide"><div class="p-name"><b>body</b><div class="p-type">array[object] <span class="req">*</span></div></div>' +
+      '<div class="p-val"><textarea id="raw-' + ep.id + '" rows="18" spellcheck="false"></textarea></div></div>';
+  } else if (ep.params.length) {
+    body += '<h3 class="sec">Parameters</h3>' + ep.params.map((p) => paramRowHtml(ep, p)).join("");
+  }
+
+  body += '<div class="btnrow" id="btnrow-' + ep.id + '"></div>';
+
+  body += '<div class="codebox dark" id="curlbox-' + ep.id + '" style="display:none">' +
+    '<div class="boxhead">Curl<button class="copybtn" data-copytarget="curlpre-' + ep.id + '">copy</button></div>' +
+    '<pre id="curlpre-' + ep.id + '"></pre></div>';
+
+  body += '<div class="codebox" id="respbox-' + ep.id + '" style="display:none">' +
+    '<div class="boxhead">Server response<button class="copybtn" data-copytarget="respbody-' + ep.id + '">copy</button></div>' +
+    '<div class="respmeta" id="respmeta-' + ep.id + '"></div>' +
+    '<details class="respheaders" id="resphead-' + ep.id + '" style="display:none"><summary>response headers</summary><table></table></details>' +
+    '<pre id="respbody-' + ep.id + '"></pre></div>';
+
+  body += '<h3 class="sec">Responses</h3>' + respDocsHtml(ep);
+
+  return '<div class="op" id="op-' + ep.id + '">' +
+    '<div class="ophead" data-ep="' + ep.id + '">' +
+      '<span class="mbadge ' + ep.method.toLowerCase() + '">' + ep.method + "</span>" +
+      '<span class="oppath">/' + esc(ep.path) + (ep.auth === "url" ? "/{key}" : "") + "</span>" +
+      '<span class="opsum">' + esc(ep.summary) + "</span>" +
+      '<span class="opchips">' + chips + "</span>" +
+      '<span class="chev"></span>' +
+    "</div>" +
+    '<div class="opbody">' + body + "</div>" +
+    "</div>";
+}
+
+function renderBtnRow(ep) {
+  const row = $("#btnrow-" + ep.id);
+  const trying = state.trying.has(ep.id);
+  row.innerHTML = trying
+    ? '<button class="btn exec" data-act="exec">Execute</button>' +
+      '<button class="btn clear" data-act="clear">Clear</button>' +
+      '<button class="btn cancel" data-act="cancel">Cancel</button>' +
+      '<span class="exec-msg" id="execmsg-' + ep.id + '"></span>'
+    : '<button class="btn try" data-act="try">Try it out</button>';
+  row.querySelectorAll("button").forEach((b) => {
+    b.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      const act = b.dataset.act;
+      if (act === "try") setTryMode(ep, true);
+      else if (act === "cancel") setTryMode(ep, false);
+      else if (act === "exec") runRequest(ep);
+      else if (act === "clear") clearOp(ep);
+    });
+  });
+}
+
+function setTryMode(ep, on) {
+  const op = $("#op-" + ep.id);
+  if (on) state.trying.add(ep.id); else state.trying.delete(ep.id);
+  $$("#op-" + ep.id + " .opbody input, #op-" + ep.id + " .opbody textarea, #op-" + ep.id + " .opbody select").forEach((el) => { el.disabled = !on; });
+  renderBtnRow(ep);
+  if (on) op.classList.add("open");
+}
+
+function clearOp(ep) {
+  delete state.forms[ep.id];
+  const keepOpen = $("#op-" + ep.id).classList.contains("open");
+  const wasTrying = state.trying.has(ep.id);
+  $("#op-" + ep.id).outerHTML = opHtml(ep);
+  const newOp = $("#op-" + ep.id);
+  if (keepOpen) newOp.classList.add("open");
+  bindOp(ep, newOp);
+  if (wasTrying) setTryMode(ep, true);
+}
+
+function bindOp(ep, opEl) {
+  opEl.querySelector(".ophead").addEventListener("click", () => {
+    opEl.classList.toggle("open");
+  });
+  if (ep.bodyMode === "raw") {
+    const ta = $("#raw-" + ep.id);
+    ta.value = loadFormState(ep).__raw;
+    ta.addEventListener("input", () => { loadFormState(ep).__raw = ta.value; });
+  }
+  $$(".opbody [data-p]", opEl).forEach((el) => {
+    const name = el.dataset.p;
+    const p = ep.params.find((x) => x.name === name);
+    const handler = () => {
+      const vals = loadFormState(ep);
+      if (p.type === "checkbox") {
+        vals[name] = el.checked;
+        const lab = el.parentElement.querySelector(".cblabel");
+        if (lab) lab.textContent = el.checked ? "true" : "false";
+      } else vals[name] = el.value;
+    };
+    el.addEventListener("input", handler);
+    el.addEventListener("change", handler);
+  });
+  $$(".opbody [data-checks]", opEl).forEach((el) => {
+    el.addEventListener("change", () => {
+      const name = el.dataset.checks;
+      loadFormState(ep)[name] = $$('#op-' + ep.id + ' [data-checks="' + name + '"]:checked').map((c) => c.value);
+    });
+  });
+  $$(".copybtn", opEl).forEach((b) => {
+    b.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText($("#" + b.dataset.copytarget).textContent);
+        b.textContent = "copied";
+        setTimeout(() => { b.textContent = "copy"; }, 1200);
+      } catch (e) { b.textContent = "failed"; }
+    });
+  });
+  $$(".opbody input, .opbody textarea, .opbody select", opEl).forEach((el) => { el.disabled = !state.trying.has(ep.id); });
+  renderBtnRow(ep);
+}
+
+function renderAll() {
+  const groups = $("#groups");
+  let html = "";
+  for (const g of GROUP_ORDER) {
+    const eps = ENDPOINTS.filter((e) => e.group === g);
+    if (!eps.length) continue;
+    html += '<div data-ganchor="' + esc(g) + '"></div>';
+    html += "<h2 class=\"tag\">" + esc(g) + "</h2>";
+    for (const ep of eps) html += opHtml(ep);
+  }
+  groups.innerHTML = html;
+  ENDPOINTS.forEach((ep) => bindOp(ep, $("#op-" + ep.id)));
+}
+
+function highlightJson(json) {
+  const safe = String(json).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return safe.replace(
+    /("(?:\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*")(\s*:)?|-?\d+\.?\d*(?:[eE][+-]?\d+)?\b|\btrue\b|\bfalse\b|\bnull\b/g,
+    (m, str, colon) => {
+      if (str !== undefined) return colon ? '<span class="jk">' + str + "</span>" + colon : '<span class="js">' + str + "</span>";
+      if (m === "true" || m === "false") return '<span class="jb">' + m + "</span>";
+      if (m === "null") return '<span class="jl">null</span>';
+      return '<span class="jn">' + m + "</span>";
+    }
+  );
+}
+
+async function runRequest(ep) {
+  const errEl = $("#execmsg-" + ep.id);
+  errEl.textContent = "";
+  if (!state.base.trim()) { errEl.textContent = "Set the base URL first."; return; }
+  if (!state.key.trim()) { errEl.textContent = "Set the API key first."; return; }
+
+  let bodyJson = null;
+  if (ep.method !== "GET") {
+    const r = collectBody(ep);
+    if (r.error) { errEl.textContent = r.error; return; }
+    bodyJson = JSON.stringify(r.body);
+  }
+
+  const url = endpointUrl(ep);
+  const headers = { "Accept": "application/json" };
+  if (bodyJson !== null) headers["Content-Type"] = "application/json";
+
+  const curl = curlFor(ep);
+  const curlBox = $("#curlbox-" + ep.id);
+  if (curl) { curlBox.style.display = ""; $("#curlpre-" + ep.id).textContent = curl; }
+
+  const respBox = $("#respbox-" + ep.id);
+  const meta = $("#respmeta-" + ep.id);
+  respBox.style.display = "";
+  meta.innerHTML = '<span class="status s0">pending</span><span>sending...</span>';
+  $("#resphead-" + ep.id).style.display = "none";
+  $("#respbody-" + ep.id).textContent = "";
+
+  const t0 = performance.now();
+  try {
+    const res = await fetch(url, { method: ep.method, headers, body: bodyJson });
+    const ms = Math.round(performance.now() - t0);
+    const text = await res.text();
+    const sc = "s" + Math.floor(res.status / 100);
+    meta.innerHTML = '<span class="status ' + sc + '">' + res.status + " " + esc(res.statusText || "") + "</span>" +
+      "<span>" + ms + " ms</span><span>" + (text.length / 1024).toFixed(1) + " kB</span><span style=\"word-break:break-all\">" + esc(url) + "</span>";
+
+    const hd = $("#resphead-" + ep.id);
+    hd.style.display = "";
+    hd.querySelector("table").innerHTML = Array.from(res.headers.entries())
+      .map(([k, v]) => "<tr><td>" + esc(k) + "</td><td>" + esc(v) + "</td></tr>").join("");
+
+    const pre = $("#respbody-" + ep.id);
+    const ct = res.headers.get("content-type") || "";
+    if (ct.includes("json")) {
+      try { JSON.parse(text); pre.innerHTML = highlightJson(JSON.stringify(JSON.parse(text), null, 2)); }
+      catch (e) { pre.textContent = text; }
+    } else if (ct.includes("xml")) {
+      pre.innerHTML = '<span class="jk">' + esc(text) + "</span>";
+    } else {
+      pre.textContent = text;
+    }
+  } catch (e) {
+    const ms = Math.round(performance.now() - t0);
+    meta.innerHTML = '<span class="status s0">error</span><span>' + ms + " ms</span>";
+    $("#respbody-" + ep.id).textContent = "Request failed: " + e.message + "\n\nPossible causes: wrong base URL, server down, network blocked, or CORS refused (Wavelog normally allows *, so a proxy in front may strip it).";
+  }
+}
+
+function initCfg() {
+  const baseEl = $("#base-url");
+  const keyEl = $("#api-key");
+  baseEl.value = state.base;
+  keyEl.value = state.key;
+  baseEl.addEventListener("input", () => { state.base = baseEl.value; localStorage.setItem("wlat_base", state.base); });
+  keyEl.addEventListener("input", () => { state.key = keyEl.value; localStorage.setItem("wlat_key", state.key); });
+  $("#explore-btn").addEventListener("click", () => { baseEl.blur(); });
+  $("#key-toggle").addEventListener("click", () => {
+    const pwd = keyEl.type === "password";
+    keyEl.type = pwd ? "text" : "password";
+    $("#key-toggle").textContent = pwd ? "hide" : "show";
+  });
+}
+
+initCfg();
+renderAll();
+</script>
+</body>
+</html>
