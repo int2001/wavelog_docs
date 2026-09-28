@@ -8,7 +8,7 @@ Contests*.
 
 - **Base path:** `/api/v2/contest`
 - **Scopes:** `contest:read`, `contest:write`, `contest:delete`
-- **Since version:** <span class="wl-since wl-since-dev">dev, not released yet</span>
+- **Since version:** <span class="wl-since">3.2.0</span>
 
 !!! note
     Read the [API v2 overview](index.md) first for authentication, the response envelope and
@@ -18,11 +18,11 @@ Contests*.
 
 | Verb | Path | Scope | Purpose | Since version |
 | --- | --- | --- | --- | --- |
-| `GET` | `/api/v2/contest` | `contest:read` | List the token owner's contest sessions | <span class="wl-since wl-since-dev">dev</span> |
-| `GET` | `/api/v2/contest/{id}` | `contest:read` | A single session, including its linked QSO ids | <span class="wl-since wl-since-dev">dev</span> |
-| `POST` | `/api/v2/contest` | `contest:write` | Create a session, optionally linking QSOs | <span class="wl-since wl-since-dev">dev</span> |
-| `PATCH` | `/api/v2/contest/{id}` | `contest:write` | Partial update; link and unlink QSOs | <span class="wl-since wl-since-dev">dev</span> |
-| `DELETE` | `/api/v2/contest/{id}` | `contest:delete` | Delete a session | <span class="wl-since wl-since-dev">dev</span> |
+| `GET` | `/api/v2/contest` | `contest:read` | List the token owner's contest sessions | <span class="wl-since">3.2.0</span> |
+| `GET` | `/api/v2/contest/{id}` | `contest:read` | A single session, including its linked QSO ids | <span class="wl-since">3.2.0</span> |
+| `POST` | `/api/v2/contest` | `contest:write` | Create a session, optionally linking QSOs | <span class="wl-since">3.2.0</span> |
+| `PATCH` | `/api/v2/contest/{id}` | `contest:write` | Partial update; link and unlink QSOs | <span class="wl-since">3.2.0</span> |
+| `DELETE` | `/api/v2/contest/{id}` | `contest:delete` | Delete a session | <span class="wl-since">3.2.0</span> |
 
 A session belonging to another user returns `404 not_found`, never `403` — the API never confirms
 that a foreign id exists.

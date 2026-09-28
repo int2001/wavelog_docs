@@ -155,7 +155,7 @@ curl -X PATCH https://<WAVELOG_URL>/index.php/api/v2/station/1 \
 The updated station object is returned in `data`.
 
 !!! note "Switching the active station location"
-    <span class="wl-since wl-since-dev">dev, not released yet</span> `set_active: true` additionally
+    <span class="wl-since">3.2.0</span> `set_active: true` additionally
     makes this location the owner's active one — the one new QSOs and the web UI
     default to:
 

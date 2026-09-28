@@ -108,7 +108,7 @@ curl -X POST https://<WAVELOG_URL>/index.php/api/v2/radio \
 ```
 
 !!! note "Field limits"
-    <span class="wl-since wl-since-dev">dev</span> The payload is validated against
+    <span class="wl-since">3.2.0</span> The payload is validated against
     the same limits the legacy [`api/radio`](../api.md#apiradio) endpoint applies,
     before anything is stored:
 

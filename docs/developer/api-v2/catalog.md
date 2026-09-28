@@ -7,7 +7,7 @@ instance.
 
 - **Base path:** `/api/v2/catalog`
 - **Scope:** none — any valid token may read it
-- **Since Version:** <span class="wl-since wl-since-dev">dev, not released yet</span>
+- **Since Version:** <span class="wl-since">3.2.0</span>
 
 !!! note
     Read the [API v2 overview](index.md) first for authentication, the response envelope and
@@ -62,9 +62,9 @@ An unknown topic returns `400 validation_error` with the valid names in `error.d
 
 | Topic | Returns | Parameters | Since |
 | --- | --- | --- | --- |
-| `contest` | The active contest catalog | — | <span class="wl-since wl-since-dev">dev</span> |
-| `dxcc` | The currently valid DXCC entities | `order=name\|prefix` (optional) | <span class="wl-since wl-since-dev">dev</span> |
-| `subdivisions` | The primary administrative subdivisions of one DXCC entity | `dxcc=<entity number>` (required) | <span class="wl-since wl-since-dev">dev</span> |
+| `contest` | The active contest catalog | — | <span class="wl-since">3.2.0</span> |
+| `dxcc` | The currently valid DXCC entities | `order=name\|prefix` (optional) | <span class="wl-since">3.2.0</span> |
+| `subdivisions` | The primary administrative subdivisions of one DXCC entity | `dxcc=<entity number>` (required) | <span class="wl-since">3.2.0</span> |
 
 ## Topic: `contest`
 

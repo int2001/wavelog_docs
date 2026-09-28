@@ -7,7 +7,7 @@ is currently active.
 
 - **Base path:** `/api/v2/logbook`
 - **Scopes:** `logbook:read`, `logbook:write`, `logbook:delete`
-- **Since version:** <span class="wl-since wl-since-dev">dev, not released yet</span>
+- **Since version:** <span class="wl-since">3.2.0</span>
 
 All operations are scoped to the token owner. A logbook belonging to another user is treated as
 *not found*.
@@ -31,11 +31,11 @@ Deleting a logbook therefore never touches a QSO; deleting a station location do
 
 | Verb | Path | Scope | Purpose | Since version |
 | --- | --- | --- | --- | --- |
-| `GET` | `/api/v2/logbook` | `logbook:read` | List all your logbooks | <span class="wl-since wl-since-dev">dev</span> |
-| `GET` | `/api/v2/logbook/{id}` | `logbook:read` | Fetch a single logbook | <span class="wl-since wl-since-dev">dev</span> |
-| `POST` | `/api/v2/logbook` | `logbook:write` | Create a logbook | <span class="wl-since wl-since-dev">dev</span> |
-| `PATCH` | `/api/v2/logbook/{id}` | `logbook:write` | Rename, set active, change linked locations | <span class="wl-since wl-since-dev">dev</span> |
-| `DELETE` | `/api/v2/logbook/{id}` | `logbook:delete` | Delete a logbook | <span class="wl-since wl-since-dev">dev</span> |
+| `GET` | `/api/v2/logbook` | `logbook:read` | List all your logbooks | <span class="wl-since">3.2.0</span> |
+| `GET` | `/api/v2/logbook/{id}` | `logbook:read` | Fetch a single logbook | <span class="wl-since">3.2.0</span> |
+| `POST` | `/api/v2/logbook` | `logbook:write` | Create a logbook | <span class="wl-since">3.2.0</span> |
+| `PATCH` | `/api/v2/logbook/{id}` | `logbook:write` | Rename, set active, change linked locations | <span class="wl-since">3.2.0</span> |
+| `DELETE` | `/api/v2/logbook/{id}` | `logbook:delete` | Delete a logbook | <span class="wl-since">3.2.0</span> |
 
 List endpoints are not paginated — users typically have only a handful of logbooks.
 
