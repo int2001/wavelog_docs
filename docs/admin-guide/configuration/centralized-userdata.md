@@ -40,3 +40,7 @@ You don't have to do anything. New files will be saved in the new folder structu
 
  1. If you have other 'non-admin' users first enable the maintenance mode ([wiki how to](../administration/maintenance-mode.md))
  2. Perform only the steps 6-9 from the list above.
+
+## Storing userdata on S3
+
+To store userdata in an S3 bucket instead of a local folder, see [Userdata on S3 Storage](userdata-s3.md).
