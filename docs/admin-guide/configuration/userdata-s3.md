@@ -7,6 +7,65 @@ This works with any S3 compatible storage like AWS S3, RustFS, Ceph RGW, Garage 
 !!! info "Only userdata"
     Only put `userdata` on S3. All other writable folders (`application/config`, `uploads`, `backup`, `updates`, `application/logs`, `application/cache`) stay on a regular volume.
 
+## Linux Server
+
+Use [rclone](https://rclone.org/commands/rclone_mount/) to mount the bucket, started by a systemd unit. The examples assume Debian/Ubuntu with Wavelog in `/var/www/html`, see [Linux installation](../../getting-started/installation/linux.md).
+
+### 1. Install rclone
+
+```bash
+sudo apt install rclone fuse3
+```
+
+### 2. Configure the S3 remote
+
+Create `/etc/rclone/rclone.conf` and make it readable for root only with `sudo chmod 600 /etc/rclone/rclone.conf`:
+
+```ini
+[s3]
+type = s3
+provider = Other
+endpoint = https://s3.example.com
+access_key_id = YOUR_ACCESS_KEY
+secret_access_key = YOUR_SECRET_KEY
+```
+
+Set `provider` to match your storage (`AWS`, `Ceph`, `Other`, ...). See the [rclone S3 docs](https://rclone.org/s3/) for all options.
+
+### 3. Create the systemd unit
+
+Create `/etc/systemd/system/wavelog-userdata.service`:
+
+```ini
+[Unit]
+Description=Wavelog userdata on S3
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=notify
+ExecStart=/usr/bin/rclone mount s3:wavelog-userdata /var/www/html/userdata \
+  --config /etc/rclone/rclone.conf \
+  --allow-other --uid 33 --gid 33 \
+  --vfs-cache-mode writes
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+
+`uid`/`gid` 33 is `www-data` on Debian/Ubuntu. On other distributions check the webserver user with `id <user>`.
+
+### 4. Start it
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now wavelog-userdata.service
+findmnt /var/www/html/userdata
+```
+
+If `userdata` already contains files, run `sudo mv /var/www/html/userdata /var/www/html/userdata.old && sudo mkdir /var/www/html/userdata` before starting the unit, then copy them back as described in [Migrating existing data](#migrating-existing-data).
+
 ## Docker
 
 Use the [rclone Docker volume plugin](https://rclone.org/docker/). It mounts the bucket as a Docker volume, so the container setup stays the same. The plugin only works with Docker Engine on Linux, not with Docker Desktop.
@@ -127,7 +186,8 @@ spec:
 
 1. Enable the [maintenance mode](../administration/maintenance-mode.md).
 2. Back up your current `userdata` folder.
-3. Start Wavelog with the new S3 volume and copy the old data into the running container:
+3. Start Wavelog with the new S3 volume and copy the old data into it:
+    - Linux server: `sudo cp -r /var/www/html/userdata.old/. /var/www/html/userdata/`
     - Docker: `docker cp ./userdata/. wavelog-main:/var/www/html/userdata/`
     - Kubernetes: `kubectl cp ./userdata/. <wavelog-pod>:/var/www/html/userdata/`
 4. Go to **Admin > Debug** and check that `userdata` is shown as writable.
