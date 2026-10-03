@@ -115,42 +115,65 @@ volumes:
 
 `uid`/`gid` 33 is `www-data` inside the Wavelog container. Then recreate the stack with `docker compose up -d`.
 
-## Kubernetes
+## Kubernetes (experimental)
 
-Use the CSI driver [k8s-csi-s3](https://github.com/yandex-cloud/k8s-csi-s3) instead of a block storage PVC. As a bonus the volume is `ReadWriteMany`, so multiple Wavelog replicas can share the same userdata.
+!!! danger "Experimental"
+    S3 on Kubernetes works, but has a drawback that matters in production: if the CSI driver pod restarts, Wavelog loses access to its files until the Wavelog pods are restarted as well. See [Driver restarts](#driver-restarts) below. For production a regular `ReadWriteMany` volume (CephFS, NFS, ...) is the safer choice.
+
+Use the CSI driver [csi-rclone](https://github.com/SwissDataScienceCenter/csi-rclone) by the Swiss Data Science Center instead of a block storage PVC. It uses rclone like the setups above. As a bonus the volume is `ReadWriteMany`, so multiple Wavelog replicas can share the same userdata.
 
 ### 1. Install the driver
 
 ```bash
-helm repo add yandex-s3 https://yandex-cloud.github.io/k8s-csi-s3/charts
-helm install csi-s3 yandex-s3/csi-s3 --namespace kube-system \
-  --set secret.endpoint=https://s3.example.com \
-  --set secret.accessKey=YOUR_ACCESS_KEY \
-  --set secret.secretKey=YOUR_SECRET_KEY \
-  --set storageClass.singleBucket=wavelog-userdata \
-  --set storageClass.mountOptions="--memory-limit 1000 --stat-cache-ttl 5s --uid 33 --gid 33 --dir-mode 0755 --file-mode 0644" \
-  --set storageClass.reclaimPolicy=Retain
+helm repo add renku https://swissdatasciencecenter.github.io/helm-charts
+helm install csi-rclone renku/csi-rclone --namespace csi-rclone --create-namespace
 ```
 
-This creates the StorageClass `csi-s3`. Check the [chart values](https://github.com/yandex-cloud/k8s-csi-s3/tree/master/deploy/helm/csi-s3) for all options.
+This creates the StorageClass `csi-rclone`. Check the [chart values](https://github.com/SwissDataScienceCenter/csi-rclone/blob/master/deploy/csi-rclone/values.yaml) for all options.
 
-- `--stat-cache-ttl 5s`: GeeseFS caches file metadata for 1 minute by default. With multiple Wavelog replicas a freshly uploaded QSL card is invisible to the other replicas for that time and returns a 404. A few seconds is a good tradeoff between delay and S3 requests.
-- `reclaimPolicy=Retain`: With the default `Delete` the data in the bucket is deleted together with the PVC.
+The driver pods run privileged (FUSE). If your cluster enforces Pod Security Standards, label the namespace with `pod-security.kubernetes.io/enforce=privileged`. If NetworkPolicies restrict egress, the driver pods need access to the Kubernetes API and your S3 endpoint.
 
-!!! warning "Mount options can't be changed later"
-    The options are stored in the StorageClass and in every PersistentVolume created from it. Both are immutable. To change them, delete and recreate the StorageClass, then recreate the PVC and copy the data again (see [Migrating existing data](#migrating-existing-data)).
+### 2. Create the Secret
 
-### 2. Create the PVC and mount it
+The driver reads the rclone configuration from a Secret with the **same name as the PVC** in the same namespace:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: wavelog-userdata # must match the PVC name
+  namespace: wavelog
+type: Opaque
+stringData:
+  remote: s3
+  remotePath: wavelog-userdata # bucket name, optionally with a prefix: bucket/prefix
+  configData: |
+    [s3]
+    type = s3
+    provider = Other
+    endpoint = https://s3.example.com
+    access_key_id = YOUR_ACCESS_KEY
+    secret_access_key = YOUR_SECRET_KEY
+  vfsOpt: '{"UID": 33, "GID": 33, "DirCacheTime": "5s", "CacheMode": "writes"}'
+```
+
+- `remotePath` is mounted as is. If you delete and recreate the PVC, it finds its data again. The driver never deletes data in the bucket.
+- `vfsOpt` takes [rclone VFS options](https://rclone.org/commands/rclone_mount/#vfs-virtual-file-system) in JSON. `UID`/`GID` 33 is `www-data` inside the Wavelog image.
+- `DirCacheTime` is how long rclone caches directory listings (default 1 minute). With multiple Wavelog replicas a freshly uploaded QSL card is invisible to the other replicas for that time and returns a 404. A few seconds is a good tradeoff between delay and S3 requests.
+- The options are read when the volume is mounted. To change them, edit the Secret and restart the Wavelog pods.
+
+### 3. Create the PVC and mount it
 
 ```yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: wavelog-userdata
+  namespace: wavelog
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: csi-s3
+  storageClassName: csi-rclone
   resources:
     requests:
       storage: 10Gi # ignored by S3, but required by Kubernetes
@@ -173,8 +196,35 @@ spec:
             claimName: wavelog-userdata
 ```
 
+!!! warning "Multiple replicas"
+    Even with a short `DirCacheTime` a new file takes a few seconds to show up on the other replicas, because rclone uploads it shortly after it was written. Sticky sessions on your ingress controller send each user to the same replica, so the uploader sees the file immediately.
+
 !!! note "Mountpoint for Amazon S3"
     The AWS CSI driver "Mountpoint for Amazon S3" is not recommended. By default it can't overwrite or delete files, which Wavelog needs.
+
+### Driver restarts
+
+rclone runs inside the driver's node pod (`csi-rclone-nodeplugin`). If that pod restarts, every mount on that node is gone. The Wavelog pods on that node keep running, but `userdata` fails with `Transport endpoint is not connected`: QSL images return errors and uploads fail. Kubernetes doesn't remount volumes of running pods, and restarting only the container doesn't help either. The whole pod has to be recreated. This is a limitation of FUSE based CSI drivers in general.
+
+When it happens:
+
+- **Driver upgrade:** The DaemonSet replaces all driver pods right away, also on nodes with running Wavelog pods. This is the main cause.
+- **Driver crash:** Rare, for example when the rclone daemon fails its liveness probe.
+- **Node reboot or drain:** Harmless, the Wavelog pods are restarted or moved anyway.
+
+After a driver restart, recreate the Wavelog pods:
+
+```bash
+kubectl -n wavelog rollout restart deployment/wavelog
+```
+
+To avoid surprise restarts on upgrades, set the update strategy of the driver DaemonSet to `OnDelete`. A new driver version is then only rolled out when its pod is deleted, for example during the next node drain, when the Wavelog pods move anyway. The chart has no value for this, use a [Helm post-renderer](https://helm.sh/docs/topics/advanced/#post-rendering) or patch the DaemonSet:
+
+```bash
+kubectl -n csi-rclone patch daemonset csi-rclone-nodeplugin -p '{"spec":{"updateStrategy":{"type":"OnDelete"}}}'
+```
+
+A `helm upgrade` resets a manual patch, so a post-renderer is the permanent solution.
 
 ## Things to keep in mind
 
