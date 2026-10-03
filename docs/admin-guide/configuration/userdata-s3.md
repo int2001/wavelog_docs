@@ -4,8 +4,10 @@ Wavelog stores user files (QSL cards, eQSL cards, QSL postcard images) in the `u
 
 This works with any S3 compatible storage like AWS S3, RustFS, Ceph RGW, Garage or Hetzner Object Storage.
 
-!!! info "Only userdata"
-    Only put `userdata` on S3. All other writable folders (`application/config`, `uploads`, `backup`, `updates`, `application/logs`, `application/cache`) stay on a regular volume.
+!!! info "Which folders belong on S3"
+    `userdata` and `backup` are a good fit: files are written once and read rarely. Mount `backup` the same way as shown below for `userdata`, with its own bucket or prefix.
+
+    The other writable folders (`application/config`, `application/logs`, `application/cache`, `uploads`, `updates`) technically work on S3 too, but are **not recommended**. They are read on every request or written often in small pieces, which is slow and causes many S3 requests. Keep them on a regular volume.
 
 ## Linux Server
 
@@ -14,7 +16,7 @@ Use [rclone](https://rclone.org/commands/rclone_mount/) to mount the bucket, sta
 ### 1. Install rclone
 
 ```bash
-sudo apt install rclone fuse3
+sudo apt install rclone fuse3 ca-certificates
 ```
 
 ### 2. Configure the S3 remote
