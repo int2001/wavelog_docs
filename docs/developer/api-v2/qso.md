@@ -389,9 +389,31 @@ tx_pwr, prop_mode, sat_name, sat_mode, sota_ref, pota_ref, wwff_ref, iota, sig,
 sig_info, darc_dok, state, cnty, cqz, ituz, qsl_via, srx, stx, srx_string, stx_string
 ```
 
+<span class="wl-since">3.2.5</span> The QSL sent status and the contact's e-mail can
+be set too, e.g. by a tool that sends QSL cards:
+
+| Field | Values |
+| --- | --- |
+| `qsl_sent` | `Y`, `N`, `R`, `Q` or `I` (case-insensitive) |
+| `qsl_sent_via` | `B` (bureau), `D` (direct), `E` (electronic) or `M` (manager) |
+| `qslsdate` | Date the QSL was sent, `YYYY-MM-DD`; `null` or `""` clears it |
+| `email` | A valid e-mail address |
+
+`qsl_sent: "Y"` without `qslsdate` stores the current date, like marking a QSL as
+sent in the web UI. An invalid value returns `400 validation_error` with the
+field name in `details`.
+
+```bash
+curl -X PATCH https://<WAVELOG_URL>/index.php/api/v2/qso/4886      -H "Authorization: Bearer wl2_your_token_here"      -H "Content-Type: application/json"      -d '{ "qsl_sent": "Y", "qsl_sent_via": "B" }'
+```
+
+!!! warning
+    These are the same fields the web UI uses for paper QSLs, so a `PATCH`
+    overwrites a status that was set there.
+
 !!! note
-    QSL / LoTW / eQSL confirmation bookkeeping and DXCC / country recalculation
-    fields are intentionally **not** editable through the API.
+    QSL received, LoTW / eQSL confirmation bookkeeping and DXCC / country
+    recalculation fields are intentionally **not** editable through the API.
 
 ## Delete a QSO
 
